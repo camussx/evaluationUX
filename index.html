@@ -1,809 +1,778 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px '.AppleSystemUIFontMonospaced'}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px '.AppleSystemUIFontMonospaced'; min-height: 15.0px}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; min-height: 15.0px}
-    span.s1 {font: 14.1px 'Helvetica Neue'}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UX Feature Evaluation Framework · SCB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark:    #1C1C2E;
+      --red:     #C1272D;
+      --red-dim: #8B1A1A;
+      --cream:   #F8F6F1;
+      --white:   #FFFFFF;
+      --gray:    #888888;
+      --lgray:   #E0DDD8;
+      --dgray:   #444444;
+      --shadow:  0 2px 12px rgba(0,0,0,0.08);
+      --radius:  10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dgray);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: linear-gradient(135deg, #1C1C2E 0%, #2A1F3D 60%, #1C1C2E 100%);
+      border-bottom: 4px solid var(--red);
+      padding: 40px 32px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .site-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; width: 6px; height: 100%;
+      background: var(--red);
+    }
+    .site-header::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(193,39,45,0.07);
+      pointer-events: none;
+    }
+    .header-inner { max-width: 920px; margin: 0 auto; }
+    .header-eyebrow {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--red); font-weight: 700; margin-bottom: 12px;
+    }
+    .header-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(24px, 4vw, 36px);
+      color: #fff; font-weight: 400; line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .header-sub { font-size: 13px; color: #B0A8C4; font-weight: 300; }
+    .header-stats {
+      display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap;
+    }
+    .hstat {
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 10px 20px;
+    }
+    .hstat-v { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--red); }
+    .hstat-l { font-size: 10px; color: #B0A8C4; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+    /* ── TABS ── */
+    .tabs-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--lgray);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .tabs-inner { max-width: 920px; margin: 0 auto; display: flex; }
+    .tab-btn {
+      padding: 14px 24px; border: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; color: var(--gray);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
+    .tab-btn:hover:not(.active) { color: var(--dark); }
+
+    /* ── MAIN ── */
+    .main { max-width: 920px; margin: 0 auto; padding: 28px 16px 60px; }
+
+    /* ── SUMMARY CARDS ── */
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .scard {
+      background: #fff; border: 1px solid var(--lgray);
+      border-radius: var(--radius); padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .scard-v { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 500; color: var(--dark); }
+    .scard-l { font-size: 11px; color: var(--gray); margin-top: 4px; }
+    .scard-l strong { color: var(--dgray); }
+
+    /* ── RUBRIC TABLE ── */
+    .rubric-table {
+      background: #fff; border-radius: var(--radius);
+      border: 1px solid var(--lgray); overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .rtable-header {
+      display: grid; grid-template-columns: 36px 1fr 80px 100px;
+      background: var(--dark); padding: 12px 16px; gap: 8px;
+    }
+    .rth { font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #B0A8C4; }
+    .rth.center { text-align: center; }
+    .rth.right  { text-align: right; }
+
+    .rrow {
+      display: grid; grid-template-columns: 36px 1fr 80px 100px;
+      padding: 14px 16px; gap: 8px;
+      border-bottom: 1px solid #F5F3EF;
+      cursor: pointer; align-items: center;
+      transition: background 0.15s;
+    }
+    .rrow:hover { background: #FAFAF8; }
+    .rrow.expanded { background: #FAFAF8; border-bottom: none; }
+    .rrow:last-child { border-bottom: none; }
+
+    .rnum {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+      font-family: 'DM Mono', monospace; flex-shrink: 0;
+    }
+    .rname { font-size: 14px; font-weight: 600; color: var(--dark); }
+    .rheuristic { font-size: 11px; color: var(--gray); margin-top: 2px; }
+    .rbadge {
+      display: inline-block; font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px; margin-left: 6px;
+      text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle;
+    }
+    .rbadge.base  { background: #FFF3CD; color: #856404; }
+    .rbadge.nuevo { background: #E8F5E9; color: #2E7D32; }
+
+    .wbar-wrap { display: flex; align-items: center; gap: 6px; }
+    .wbar { height: 7px; border-radius: 4px; }
+    .wbar-pct { font-size: 11px; font-weight: 700; color: var(--gray); font-family: 'DM Mono', monospace; }
+
+    .rtoggle { font-size: 11px; color: var(--red); text-align: right; font-weight: 600; }
+
+    /* Expanded content */
+    .rexpand {
+      padding: 0 16px 18px 60px;
+      background: #FAFAF8;
+      border-bottom: 1px solid var(--lgray);
+      animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+    .rdesc { font-size: 13px; color: var(--gray); margin-bottom: 14px; font-style: italic; }
+    .scale-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .scale-card { border-radius: 8px; padding: 12px 14px; border-width: 1px; border-style: solid; }
+    .scale-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .scale-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .scale-score { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; }
+    .scale-text { font-size: 12px; line-height: 1.55; }
+
+    /* ── LEGEND ── */
+    .legend {
+      margin-top: 14px; display: flex; gap: 16px; flex-wrap: wrap;
+      padding: 10px 14px; background: #fff; border-radius: 8px;
+      border: 1px solid var(--lgray); font-size: 12px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; color: var(--gray); }
+
+    /* ── EVALUADOR ── */
+    .eval-header {
+      background: #fff; border-radius: var(--radius);
+      border: 1px solid var(--lgray); padding: 24px;
+      margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .eval-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .eval-title { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .eval-sub { font-size: 13px; color: var(--gray); }
+    .score-display {
+      text-align: center; padding: 14px 22px;
+      border-radius: 12px; border-width: 2px; border-style: solid;
+      min-width: 140px;
+    }
+    .score-v { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 500; }
+    .score-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+    .score-sub { font-size: 10px; color: var(--gray); margin-top: 2px; }
+
+    .criterion-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid #F5F5F5; flex-wrap: wrap;
+    }
+    .cr-info { display: flex; align-items: center; gap: 8px; min-width: 200px; flex: 1; }
+    .cr-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .cr-name { font-size: 13px; font-weight: 600; color: var(--dark); }
+    .cr-weight { font-size: 11px; color: var(--gray); }
+    .btn-grid { display: flex; gap: 4px; flex-wrap: wrap; }
+    .score-btn {
+      width: 30px; height: 30px; border-radius: 6px; border-width: 1px; border-style: solid;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'DM Mono', monospace; transition: all 0.15s;
+      border-color: var(--lgray); background: #F9F9F9; color: var(--dgray);
+    }
+    .score-btn.active { color: #fff; }
+    .score-btn:hover:not(.active) { border-color: #aaa; background: #F0F0F0; }
+    .score-badge {
+      font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700;
+      padding: 3px 10px; border-radius: 6px; border-width: 1px; border-style: solid;
+      white-space: nowrap;
+    }
+
+    /* Breakdown */
+    .breakdown {
+      margin-top: 20px; background: var(--cream);
+      border-radius: 8px; padding: 16px; border: 1px solid var(--lgray);
+    }
+    .breakdown-title { font-size: 14px; font-weight: 700; color: var(--dgray); margin-bottom: 12px; }
+    .bd-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 0; border-bottom: 1px solid var(--lgray); font-size: 12px;
+    }
+    .bd-row:last-child { border-bottom: none; }
+    .bd-name { color: var(--dgray); }
+    .bd-calc { color: var(--gray); margin-right: 8px; }
+    .bd-pts { font-weight: 700; font-family: 'DM Mono', monospace; }
+    .btn-reset {
+      margin-top: 12px; padding: 8px 16px; background: transparent;
+      border: 1px solid var(--lgray); border-radius: 6px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--gray);
+      transition: all 0.15s;
+    }
+    .btn-reset:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── FRAMEWORK TAB ── */
+    .fw-section {
+      background: #fff; border-radius: var(--radius);
+      border: 1px solid var(--lgray); padding: 24px;
+      margin-bottom: 20px; box-shadow: var(--shadow);
+    }
+    .fw-title { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .fw-sub { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+
+    .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .bar-name { width: 200px; font-size: 12px; color: var(--dgray); text-align: right; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 18px; background: #F0EDE8; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center;
+      justify-content: flex-end; padding-right: 6px; transition: width 0.6s ease; }
+    .bar-pct { font-size: 10px; font-weight: 700; color: #fff; font-family: 'DM Mono', monospace; }
+    .bar-dim { width: 80px; font-size: 10px; color: var(--gray); }
+
+    /* Justification cards */
+    .just-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .just-card {
+      background: #fff; border: 1px solid var(--lgray); border-radius: var(--radius);
+      padding: 18px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .just-accent {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    }
+    .just-inner { padding-left: 14px; }
+    .just-pct { font-size: 28px; font-weight: 700; font-family: 'DM Mono', monospace; margin-bottom: 2px; }
+    .just-title { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .just-sub { font-size: 11px; color: var(--gray); font-style: italic; margin-bottom: 10px; }
+    .just-divider { height: 1px; background: var(--lgray); margin: 10px 0; }
+    .just-desc { font-size: 12px; color: var(--dgray); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      background: var(--dark); color: #666677;
+      text-align: center; padding: 14px 16px;
+      font-size: 11px; margin-top: 0;
+    }
+    .site-footer span { color: var(--red); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .rtable-header, .rrow { grid-template-columns: 28px 1fr 60px 70px; }
+      .rexpand { padding-left: 16px; }
+      .scale-grid { grid-template-columns: 1fr; }
+      .just-grid { grid-template-columns: 1fr; }
+      .bar-name { width: 120px; font-size: 11px; }
+      .tab-btn { padding: 12px 14px; font-size: 12px; }
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;html lang="es"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;UX Feature Evaluation Framework · SCB&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&amp;family=DM+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }</p>
-<p class="p2"><br></p>
-<p class="p1">```</p>
-<p class="p1">:root {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--dark:<span class="Apple-converted-space">    </span>#1C1C2E;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--red: <span class="Apple-converted-space">    </span>#C1272D;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--red-dim: #8B1A1A;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--cream: <span class="Apple-converted-space">  </span>#F8F6F1;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--white: <span class="Apple-converted-space">  </span>#FFFFFF;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--gray:<span class="Apple-converted-space">    </span>#888888;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--lgray: <span class="Apple-converted-space">  </span>#E0DDD8;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--dgray: <span class="Apple-converted-space">  </span>#444444;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--shadow:<span class="Apple-converted-space">  </span>0 2px 12px rgba(0,0,0,0.08);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--radius:<span class="Apple-converted-space">  </span>10px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">html { scroll-behavior: smooth; }</p>
-<p class="p2"><br></p>
-<p class="p1">body {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-family: 'DM Sans', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background: var(--cream);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color: var(--dgray);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>min-height: 100vh;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="s1">/* </span>── HEADER ── */</p>
-<p class="p3">.site-header {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: linear-gradient(135deg, #1C1C2E 0%, #2A1F3D 60%, #1C1C2E 100%);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-bottom: 4px solid var(--red);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 40px 32px 32px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>position: relative;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>overflow: hidden;</p>
-<p class="p3">}</p>
-<p class="p3">.site-header::before {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>content: '';</p>
-<p class="p3"><span class="Apple-converted-space">  </span>position: absolute;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>left: 0; top: 0; width: 6px; height: 100%;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: var(--red);</p>
-<p class="p3">}</p>
-<p class="p3">.site-header::after {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>content: '';</p>
-<p class="p3"><span class="Apple-converted-space">  </span>position: absolute;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>right: -60px; top: -60px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>width: 280px; height: 280px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-radius: 50%;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: rgba(193,39,45,0.07);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>pointer-events: none;</p>
-<p class="p3">}</p>
-<p class="p3">.header-inner { max-width: 920px; margin: 0 auto; }</p>
-<p class="p3">.header-eyebrow {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-size: 10px; letter-spacing: 3px; text-transform: uppercase;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>color: var(--red); font-weight: 700; margin-bottom: 12px;</p>
-<p class="p3">}</p>
-<p class="p3">.header-title {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-family: 'Playfair Display', Georgia, serif;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-size: clamp(24px, 4vw, 36px);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>color: #fff; font-weight: 400; line-height: 1.2;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>margin-bottom: 10px;</p>
-<p class="p3">}</p>
-<p class="p3">.header-sub { font-size: 13px; color: #B0A8C4; font-weight: 300; }</p>
-<p class="p3">.header-stats {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap;</p>
-<p class="p3">}</p>
-<p class="p3">.hstat {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>text-align: center;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: rgba(255,255,255,0.05);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border: 1px solid rgba(255,255,255,0.1);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-radius: 8px; padding: 10px 20px;</p>
-<p class="p3">}</p>
-<p class="p3">.hstat-v { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--red); }</p>
-<p class="p3">.hstat-l { font-size: 10px; color: #B0A8C4; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── TABS ── */</p>
-<p class="p3">.tabs-bar {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #fff;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-bottom: 1px solid var(--lgray);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>position: sticky; top: 0; z-index: 100;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>box-shadow: 0 2px 8px rgba(0,0,0,0.06);</p>
-<p class="p3">}</p>
-<p class="p3">.tabs-inner { max-width: 920px; margin: 0 auto; display: flex; }</p>
-<p class="p3">.tab-btn {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 14px 24px; border: none; background: transparent;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>cursor: pointer; color: var(--gray);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-bottom: 3px solid transparent;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>transition: all 0.2s; white-space: nowrap;</p>
-<p class="p3">}</p>
-<p class="p3">.tab-btn.active { color: var(--red); border-bottom-color: var(--red); }</p>
-<p class="p3">.tab-btn:hover:not(.active) { color: var(--dark); }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── MAIN ── */</p>
-<p class="p3">.main { max-width: 920px; margin: 0 auto; padding: 28px 16px 60px; }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── SUMMARY CARDS ── */</p>
-<p class="p3">.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }</p>
-<p class="p3">.scard {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #fff; border: 1px solid var(--lgray);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-radius: var(--radius); padding: 16px 18px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>box-shadow: var(--shadow);</p>
-<p class="p3">}</p>
-<p class="p3">.scard-v { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 500; color: var(--dark); }</p>
-<p class="p3">.scard-l { font-size: 11px; color: var(--gray); margin-top: 4px; }</p>
-<p class="p3">.scard-l strong { color: var(--dgray); }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── RUBRIC TABLE ── */</p>
-<p class="p3">.rubric-table {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #fff; border-radius: var(--radius);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border: 1px solid var(--lgray); overflow: hidden;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>box-shadow: var(--shadow);</p>
-<p class="p3">}</p>
-<p class="p3">.rtable-header {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: grid; grid-template-columns: 36px 1fr 80px 100px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: var(--dark); padding: 12px 16px; gap: 8px;</p>
-<p class="p3">}</p>
-<p class="p3">.rth { font-size: 10px; font-weight: 700; letter-spacing: 1.5px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>text-transform: uppercase; color: #B0A8C4; }</p>
-<p class="p3">.rth.center { text-align: center; }</p>
-<p class="p3">.rth.right<span class="Apple-converted-space">  </span>{ text-align: right; }</p>
-<p class="p4"><br></p>
-<p class="p3">.rrow {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: grid; grid-template-columns: 36px 1fr 80px 100px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 14px 16px; gap: 8px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-bottom: 1px solid #F5F3EF;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>cursor: pointer; align-items: center;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>transition: background 0.15s;</p>
-<p class="p3">}</p>
-<p class="p3">.rrow:hover { background: #FAFAF8; }</p>
-<p class="p3">.rrow.expanded { background: #FAFAF8; border-bottom: none; }</p>
-<p class="p3">.rrow:last-child { border-bottom: none; }</p>
-<p class="p4"><br></p>
-<p class="p3">.rnum {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>width: 28px; height: 28px; border-radius: 6px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: flex; align-items: center; justify-content: center;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-size: 11px; font-weight: 700; color: #fff;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-family: 'DM Mono', monospace; flex-shrink: 0;</p>
-<p class="p3">}</p>
-<p class="p3">.rname { font-size: 14px; font-weight: 600; color: var(--dark); }</p>
-<p class="p3">.rheuristic { font-size: 11px; color: var(--gray); margin-top: 2px; }</p>
-<p class="p3">.rbadge {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: inline-block; font-size: 9px; font-weight: 700;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 2px 6px; border-radius: 4px; margin-left: 6px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>text-transform: uppercase; letter-spacing: 0.5px; vertical-align: middle;</p>
-<p class="p3">}</p>
-<p class="p3">.rbadge.base<span class="Apple-converted-space">  </span>{ background: #FFF3CD; color: #856404; }</p>
-<p class="p3">.rbadge.nuevo { background: #E8F5E9; color: #2E7D32; }</p>
-<p class="p4"><br></p>
-<p class="p3">.wbar-wrap { display: flex; align-items: center; gap: 6px; }</p>
-<p class="p3">.wbar { height: 7px; border-radius: 4px; }</p>
-<p class="p3">.wbar-pct { font-size: 11px; font-weight: 700; color: var(--gray); font-family: 'DM Mono', monospace; }</p>
-<p class="p4"><br></p>
-<p class="p3">.rtoggle { font-size: 11px; color: var(--red); text-align: right; font-weight: 600; }</p>
-<p class="p4"><br></p>
-<p class="p3">/* Expanded content */</p>
-<p class="p3">.rexpand {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 0 16px 18px 60px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #FAFAF8;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-bottom: 1px solid var(--lgray);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>animation: slideDown 0.2s ease;</p>
-<p class="p3">}</p>
-<p class="p3">@keyframes slideDown { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }</p>
-<p class="p3">.rdesc { font-size: 13px; color: var(--gray); margin-bottom: 14px; font-style: italic; }</p>
-<p class="p3">.scale-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }</p>
-<p class="p3">.scale-card { border-radius: 8px; padding: 12px 14px; border-width: 1px; border-style: solid; }</p>
-<p class="p3">.scale-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }</p>
-<p class="p3">.scale-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }</p>
-<p class="p3">.scale-score { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; }</p>
-<p class="p3">.scale-text { font-size: 12px; line-height: 1.55; }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── LEGEND ── */</p>
-<p class="p3">.legend {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>margin-top: 14px; display: flex; gap: 16px; flex-wrap: wrap;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 10px 14px; background: #fff; border-radius: 8px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border: 1px solid var(--lgray); font-size: 12px;</p>
-<p class="p3">}</p>
-<p class="p3">.legend-item { display: flex; align-items: center; gap: 6px; color: var(--gray); }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── EVALUADOR ── */</p>
-<p class="p3">.eval-header {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #fff; border-radius: var(--radius);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border: 1px solid var(--lgray); padding: 24px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>margin-bottom: 16px; box-shadow: var(--shadow);</p>
-<p class="p3">}</p>
-<p class="p3">.eval-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }</p>
-<p class="p3">.eval-title { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }</p>
-<p class="p3">.eval-sub { font-size: 13px; color: var(--gray); }</p>
-<p class="p3">.score-display {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>text-align: center; padding: 14px 22px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-radius: 12px; border-width: 2px; border-style: solid;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>min-width: 140px;</p>
-<p class="p3">}</p>
-<p class="p3">.score-v { font-family: 'DM Mono', monospace; font-size: 36px; font-weight: 500; }</p>
-<p class="p3">.score-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }</p>
-<p class="p3">.score-sub { font-size: 10px; color: var(--gray); margin-top: 2px; }</p>
-<p class="p4"><br></p>
-<p class="p3">.criterion-row {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: flex; align-items: center; gap: 12px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 12px 0; border-bottom: 1px solid #F5F5F5; flex-wrap: wrap;</p>
-<p class="p3">}</p>
-<p class="p3">.cr-info { display: flex; align-items: center; gap: 8px; min-width: 200px; flex: 1; }</p>
-<p class="p3">.cr-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }</p>
-<p class="p3">.cr-name { font-size: 13px; font-weight: 600; color: var(--dark); }</p>
-<p class="p3">.cr-weight { font-size: 11px; color: var(--gray); }</p>
-<p class="p3">.btn-grid { display: flex; gap: 4px; flex-wrap: wrap; }</p>
-<p class="p3">.score-btn {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>width: 30px; height: 30px; border-radius: 6px; border-width: 1px; border-style: solid;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-size: 12px; font-weight: 700; cursor: pointer;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-family: 'DM Mono', monospace; transition: all 0.15s;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-color: var(--lgray); background: #F9F9F9; color: var(--dgray);</p>
-<p class="p3">}</p>
-<p class="p3">.score-btn.active { color: #fff; }</p>
-<p class="p3">.score-btn:hover:not(.active) { border-color: #aaa; background: #F0F0F0; }</p>
-<p class="p3">.score-badge {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 3px 10px; border-radius: 6px; border-width: 1px; border-style: solid;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>white-space: nowrap;</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">/* Breakdown */</p>
-<p class="p3">.breakdown {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>margin-top: 20px; background: var(--cream);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border-radius: 8px; padding: 16px; border: 1px solid var(--lgray);</p>
-<p class="p3">}</p>
-<p class="p3">.breakdown-title { font-size: 14px; font-weight: 700; color: var(--dgray); margin-bottom: 12px; }</p>
-<p class="p3">.bd-row {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>display: flex; justify-content: space-between; align-items: center;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 7px 0; border-bottom: 1px solid var(--lgray); font-size: 12px;</p>
-<p class="p3">}</p>
-<p class="p3">.bd-row:last-child { border-bottom: none; }</p>
-<p class="p3">.bd-name { color: var(--dgray); }</p>
-<p class="p3">.bd-calc { color: var(--gray); margin-right: 8px; }</p>
-<p class="p3">.bd-pts { font-weight: 700; font-family: 'DM Mono', monospace; }</p>
-<p class="p3">.btn-reset {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>margin-top: 12px; padding: 8px 16px; background: transparent;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border: 1px solid var(--lgray); border-radius: 6px; cursor: pointer;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--gray);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>transition: all 0.15s;</p>
-<p class="p3">}</p>
-<p class="p3">.btn-reset:hover { border-color: var(--red); color: var(--red); }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── FRAMEWORK TAB ── */</p>
-<p class="p3">.fw-section {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #fff; border-radius: var(--radius);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>border: 1px solid var(--lgray); padding: 24px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>margin-bottom: 20px; box-shadow: var(--shadow);</p>
-<p class="p3">}</p>
-<p class="p3">.fw-title { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }</p>
-<p class="p3">.fw-sub { font-size: 13px; color: var(--gray); margin-bottom: 20px; }</p>
-<p class="p4"><br></p>
-<p class="p3">.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }</p>
-<p class="p3">.bar-name { width: 200px; font-size: 12px; color: var(--dgray); text-align: right; flex-shrink: 0; }</p>
-<p class="p3">.bar-track { flex: 1; height: 18px; background: #F0EDE8; border-radius: 4px; overflow: hidden; }</p>
-<p class="p3">.bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>justify-content: flex-end; padding-right: 6px; transition: width 0.6s ease; }</p>
-<p class="p3">.bar-pct { font-size: 10px; font-weight: 700; color: #fff; font-family: 'DM Mono', monospace; }</p>
-<p class="p3">.bar-dim { width: 80px; font-size: 10px; color: var(--gray); }</p>
-<p class="p4"><br></p>
-<p class="p3">/* Justification cards */</p>
-<p class="p3">.just-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }</p>
-<p class="p3">.just-card {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: #fff; border: 1px solid var(--lgray); border-radius: var(--radius);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>padding: 18px; box-shadow: var(--shadow); position: relative; overflow: hidden;</p>
-<p class="p3">}</p>
-<p class="p3">.just-accent {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>position: absolute; left: 0; top: 0; bottom: 0; width: 5px;</p>
-<p class="p3">}</p>
-<p class="p3">.just-inner { padding-left: 14px; }</p>
-<p class="p3">.just-pct { font-size: 28px; font-weight: 700; font-family: 'DM Mono', monospace; margin-bottom: 2px; }</p>
-<p class="p3">.just-title { font-size: 13px; font-weight: 700; color: var(--dark); }</p>
-<p class="p3">.just-sub { font-size: 11px; color: var(--gray); font-style: italic; margin-bottom: 10px; }</p>
-<p class="p3">.just-divider { height: 1px; background: var(--lgray); margin: 10px 0; }</p>
-<p class="p3">.just-desc { font-size: 12px; color: var(--dgray); line-height: 1.6; }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── FOOTER ── */</p>
-<p class="p3">.site-footer {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>background: var(--dark); color: #666677;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>text-align: center; padding: 14px 16px;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>font-size: 11px; margin-top: 0;</p>
-<p class="p3">}</p>
-<p class="p3">.site-footer span { color: var(--red); }</p>
-<p class="p4"><br></p>
-<p class="p3">/* ── RESPONSIVE ── */</p>
-<p class="p3">@media (max-width: 640px) {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.summary-grid { grid-template-columns: 1fr 1fr; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.rtable-header, .rrow { grid-template-columns: 28px 1fr 60px 70px; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.rexpand { padding-left: 16px; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.scale-grid { grid-template-columns: 1fr; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.just-grid { grid-template-columns: 1fr; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.bar-name { width: 120px; font-size: 11px; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>.tab-btn { padding: 12px 14px; font-size: 12px; }</p>
-<p class="p3">}</p>
-<p class="p3">```</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p3">&lt;/head&gt;</p>
-<p class="p3">&lt;body&gt;</p>
-<p class="p3">&lt;div id="root"&gt;&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3">&lt;script type="text/babel"&gt;</p>
-<p class="p3">const { useState, useEffect } = React;</p>
-<p class="p4"><br></p>
-<p class="p3">// ── DATA ────────────────────────────────────────────────────────────────────</p>
-<p class="p3">const CRITERIA = [</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 1, origin: "Base", weight: 15,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#C1272D", dim: "Usabilidad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Fricción vs. Eficiencia",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Heurística Nielsen #7 · Hick's Law",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "Mide el coste real de completar una tarea: número de pasos, clics, tiempo y esfuerzo mental. Cada paso injustificado es fricción que puede costar una conversión.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Tarea irrealizable o con más de 10 pasos innecesarios. El usuario abandona antes de completar el flujo. Impacto directo y medible en tasa de conversión.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Tarea completable con esfuerzo moderado. Hay redundancias o pasos no justificados (5-6 pasos donde bastarían 3). Oportunidad de mejora clara.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Flujo óptimo: mínimo de pasos, máxima claridad. Atajos disponibles para usuarios recurrentes. Cero fricción injustificada. Benchmark de referencia.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 2, origin: "Nuevo", weight: 12,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#C1272D", dim: "Usabilidad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Carga Cognitiva",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Miller's Law · Teoría de la Carga Cognitiva",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "Cantidad de información o decisiones simultáneas que el usuario debe procesar en pantalla. En contextos financieros, la carga cognitiva elevada genera abandono.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Pantalla sobrecargada: más de 7 elementos de decisión simultáneos, texto denso sin jerarquía, múltiples llamadas a la acción compitiendo. El usuario no sabe qué hacer.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Estructura aceptable pero con ruido visual. Algunas pantallas demandan más procesamiento del necesario. Sin progressive disclosure.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Progressive disclosure aplicado correctamente. Cada pantalla expone solo lo esencial. Chunking y jerarquía tipográfica perfectos. El usuario siempre sabe cuál es el siguiente paso.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 3, origin: "Nuevo", weight: 10,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#C1272D", dim: "Usabilidad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Feedback y Visibilidad del Sistema",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Heurística Nielsen #1",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "El sistema comunica al usuario qué está ocurriendo en todo momento: estados de carga, confirmaciones, errores y progreso deben estar siempre presentes.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Sin feedback de ningún tipo. El usuario no sabe si su acción fue registrada. No existen estados de carga, confirmación ni error. Las transacciones parecen desaparecer.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Feedback parcial: hay loaders en algunos flujos pero ausentes en otros. Mensajes genéricos ('Error') sin contexto ni acción sugerida.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Todos los estados están diseñados: loading, éxito, error, vacío, estado parcial. Mensajes accionables con causa + solución. Micro-animaciones refuerzan la respuesta del sistema.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 4, origin: "Nuevo", weight: 13,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#8B1A1A", dim: "Resiliencia",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Prevención y Recuperación de Errores",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Heurística Nielsen #5 y #9",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "El sistema evita errores antes de que ocurran y ofrece rutas claras de recuperación cuando suceden. En banca, un error sin salida = cliente perdido.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Sin validación de ningún tipo. Los errores ocurren silenciosamente o con mensajes técnicos inútiles. Sin opción de deshacer acciones. Flujos destructivos sin confirmación.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Validación básica presente (campos requeridos). Los errores se reportan pero sin guía específica de resolución. Sin confirmación antes de acciones irreversibles.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Validación inline en tiempo real con indicadores positivos. Errores con causa + solución específica. Confirmación obligatoria antes de acciones destructivas. Undo disponible donde aplica.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 5, origin: "Base", weight: 8,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#1A5276", dim: "Consistencia",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Adherencia al Design System",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Heurística Nielsen #4 · Atomic Design",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "Uso de componentes estándar del sistema de diseño vs. soluciones custom no documentadas. La consistencia reduce la carga cognitiva y acelera el desarrollo.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Componentes inventados en cada pantalla sin relación con el DS. Cada pantalla parece diseñada por una persona diferente. Imposible mantener o escalar.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Uso parcial del DS. Algunos componentes correctos, otros custom sin justificación documentada. Inconsistencias de spacing, color o tipografía en detalles.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "100% componentes del DS o desviaciones formalmente documentadas con justificación de negocio aprobada. Todos los tokens de color, tipografía y espaciado son correctos.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 6, origin: "Nuevo", weight: 10,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#196F3D", dim: "Inclusión",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Accesibilidad (WCAG 2.1)",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "WCAG 2.1 · ISO 9241-171",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "Cumplimiento de estándares de accesibilidad: contraste de color, navegación por teclado, compatibilidad con lectores de pantalla y tamaños táctiles mínimos.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Falla criterios AA básicos: ratio de contraste inferior a 3:1, sin alt-text en imágenes funcionales, imposible navegar con teclado. Excluye a usuarios con discapacidad.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Cumple algunos criterios AA pero falla en interacciones complejas (dropdowns, modales, formularios dinámicos). Sin pruebas con lectores de pantalla reales.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Cumplimiento AA completo verificado con herramientas (Axe, Lighthouse &gt;95). Tamaños táctiles mínimos de 44px. ARIA labels completos. Probado con lectores de pantalla.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 7, origin: "Base", weight: 7,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#6C3483", dim: "Visual",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Estética Funcional",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Aesthetic-Usability Effect · Principios Gestalt",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "El diseño es visualmente atractivo Y sirve un propósito funcional. La belleza que no ayuda a la comprensión, estorba. Cada decisión visual debe tener intención.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Desorden visual. Inconsistencia cromática, tipografía ilegible, elementos decorativos que compiten con el contenido útil. El usuario no sabe qué es importante.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Visualmente aceptable pero plano. Sin jerarquía clara ni distinción entre pantallas o funcionalidades importantes. El diseño no comunica prioridad.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Cada decisión visual tiene intención funcional. Jerarquía cristalina: el usuario sabe qué es importante sin tener que pensarlo. La belleza y la función son inseparables.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 8, origin: "Base", weight: 10,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#1565C0", dim: "Flexibilidad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Adaptabilidad Contextual",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "User-Centered Design · Role-Based UX",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "El flujo y la experiencia se adaptan al tipo de usuario (nuevo, recurrente, agente) y al contexto (dispositivo, idioma, regulación, estado del cliente).",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Flujo único e idéntico para todos los perfiles. Un cliente nuevo ve exactamente la misma pantalla que uno con 5 años de antigüedad. Sin ninguna adaptación.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Personalización básica (saludo con nombre, datos pre-llenados). Los flujos críticos son idénticos independientemente del perfil o historial del cliente.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Flujos diferenciados por segmento. Onboarding progresivo para nuevos. Atajos inteligentes para recurrentes. Adaptación regulatoria por producto y adaptación de dispositivo completa.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 9, origin: "Nuevo", weight: 10,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#784212", dim: "Confianza",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Credibilidad y Trust Signals",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Fogg's Credibility Model · BJ Fogg",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "El diseño refuerza activamente la confianza del usuario en cada punto de decisión: transparencia de información, señales de seguridad y lenguaje honesto.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Lenguaje confuso, ambiguo o alarmante. Sin señales de seguridad en pantallas críticas (pagos, datos personales). El usuario activamente desconfía del producto.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Íconos de candado presentes pero aislados del contexto. El copy no explica claramente qué datos se usan ni por qué. Trust como decoración, no como sistema.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Trust integrado al flujo en cada punto de fricción. Microcopy honesto sobre costos, datos y procesos. Cero letra chica sorpresa. Transparencia proactiva antes de que el usuario pregunte.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 10, origin: "Nuevo", weight: 5,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>color: "#0B5345", dim: "Rendimiento",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>name: "Rendimiento Percibido",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>heuristic: "Core Web Vitals · RAIL Model (Google)",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>description: "La percepción del usuario sobre la velocidad del sistema, independientemente del tiempo real de carga. El rendimiento percibido puede optimizarse sin tocar el backend.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s1: "Pantallas en blanco durante la carga. Sin skeleton screens ni indicadores de progreso. El usuario no sabe si la app está funcionando o se colgó.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s5: "Loaders genéricos (spinners) presentes en algunos flujos. La espera se percibe larga aunque el tiempo real sea aceptable. Sin optimistic UI.",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>s10: "Skeleton screens en toda carga de datos. Optimistic UI donde aplica. Prefetching de pantallas probables. La app se siente instantánea. LCP percibido por debajo de 2.5s.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3">];</p>
-<p class="p4"><br></p>
-<p class="p3">const JUSTIFICATIONS = [</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>pct: "28%", color: "#C1272D",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>title: "Fricción + Prevención de Errores",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>sub: "Impacto directo en conversión",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>desc: "Cada paso adicional en onboarding reduce la tasa de completación entre 10-15%. Un error sin recuperación clara genera abandono irreversible y daño reputacional. (Baymard Institute, 2023)",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>pct: "22%", color: "#E05C00",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>title: "Carga Cognitiva + Feedback",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>sub: "Fricción silenciosa y costos operativos",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>desc: "En contextos de ansiedad financiera, pantallas sobrecargadas disparan abandono. Sin feedback claro, se generan doble-clics, transacciones duplicadas y llamadas a soporte con costo operativo medible.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>pct: "20%", color: "#196F3D",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>title: "Credibilidad + Accesibilidad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>sub: "Regulación y percepción de seguridad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>desc: "La credibilidad percibida determina si el usuario procede (Fogg, 2002). La EU Accessibility Act 2025 y regulaciones SBS hacen de la accesibilidad un riesgo legal, no solo de UX.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>pct: "30%", color: "#1A5276",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>title: "DS + Estética + Adaptabilidad + Rendimiento",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>sub: "Calidad de producto y escalabilidad",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>desc: "Peso moderado porque son multiplicadores: el Design System correcto acelera al equipo, pero un componente custom bien justificado puede superar a uno del DS mal aplicado.",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3">];</p>
-<p class="p4"><br></p>
-<p class="p3">// ── HELPERS ─────────────────────────────────────────────────────────────────</p>
-<p class="p3">function getScoreColor(s) {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (!s) return "#888";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (s &gt;= 8) return "#196F3D";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (s &gt;= 5) return "#E67E22";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>return "#C1272D";</p>
-<p class="p3">}</p>
-<p class="p3">function getScoreBg(s) {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (!s) return "#F5F5F5";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (s &gt;= 8) return "#EAFAF1";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (s &gt;= 5) return "#FEF9E7";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>return "#FDEDEC";</p>
-<p class="p3">}</p>
-<p class="p3">function calcWeightedScore(scores) {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>let answered = CRITERIA.filter(c =&gt; scores[c.id]);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (!answered.length) return null;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>let totalWeight = answered.reduce((a, c) =&gt; a + c.weight, 0);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>let weighted<span class="Apple-converted-space">    </span>= answered.reduce((a, c) =&gt; a + (scores[c.id] * c.weight), 0);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>return (weighted / totalWeight).toFixed(1);</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">// ── COMPONENTS ──────────────────────────────────────────────────────────────</p>
-<p class="p3">function WeightBar({ weight, color }) {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div className="wbar-wrap"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="wbar" style={{ width: weight * 4, background: color, opacity: 0.85 }} /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;span className="wbar-pct"&gt;{weight}%&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>);</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">function ScoreBadge({ score }) {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>if (!score) return null;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const c = getScoreColor(score);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const b = getScoreBg(score);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;span className="score-badge" style={{ color: c, background: b, borderColor: c }}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>{score}/10</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>);</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">function RubricTab() {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const [expanded, setExpanded] = useState(null);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const toggle = (id) =&gt; setExpanded(expanded === id ? null : id);</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="summary-grid"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>{[</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{ v: "10", l: "Criterios evaluados" },</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{ v: "100%", l: "Peso total distribuido" },</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{ v: "1–10", l: "Escala · 1=falla · 10=excelente" },</p>
-<p class="p3"><span class="Apple-converted-space">        </span>].map(c =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="scard" key={c.v}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="scard-v"&gt;{c.v}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="scard-l"&gt;{c.l}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>))}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="rubric-table"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="rtable-header"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="rth"&gt;#&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="rth"&gt;Criterio · Heurística&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="rth"&gt;Peso&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="rth right"&gt;Expandir&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>{CRITERIA.map((c, idx) =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div key={c.id}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div</p>
-<p class="p3"><span class="Apple-converted-space">              </span>className={`rrow${expanded === c.id ? " expanded" : ""}`}</p>
-<p class="p3"><span class="Apple-converted-space">              </span>onClick={() =&gt; toggle(c.id)}</p>
-<p class="p3"><span class="Apple-converted-space">              </span>style={{ background: expanded === c.id ? "#FAFAF8" : idx % 2 === 0 ? "#fff" : "#FDFCFA" }}</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="rnum" style={{ background: c.color }}&gt;{String(c.id).padStart(2,"0")}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="rname"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>{c.name}</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>&lt;span className={`rbadge ${c.origin === "Base" ? "base" : "nuevo"}`}&gt;{c.origin}&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="rheuristic"&gt;{c.heuristic}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;WeightBar weight={c.weight} color={c.color} /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="rtoggle"&gt;{expanded === c.id ? "▲ cerrar" : "▼ ver escala"}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">            </span>{expanded === c.id &amp;&amp; (</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="rexpand"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;p className="rdesc"&gt;{c.description}&lt;/p&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="scale-grid"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>{[</p>
-<p class="p3"><span class="Apple-converted-space">                    </span>{ score: 1,<span class="Apple-converted-space">  </span>label: "Falla Crítica", <span class="Apple-converted-space">  </span>bg:"#FEF2F2", bc:"#E74C3C", tc:"#922B21", text: c.s1 },</p>
-<p class="p3"><span class="Apple-converted-space">                    </span>{ score: 5,<span class="Apple-converted-space">  </span>label: "Funcional Básico", bg:"#FEF9E7", bc:"#F39C12", tc:"#7D6608", text: c.s5 },</p>
-<p class="p3"><span class="Apple-converted-space">                    </span>{ score: 10, label: "Excelencia UX",<span class="Apple-converted-space">    </span>bg:"#EAFAF1", bc:"#27AE60", tc:"#1E8449", text: c.s10 },</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>].map(lv =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">                    </span>&lt;div className="scale-card" key={lv.score}</p>
-<p class="p3"><span class="Apple-converted-space">                      </span>style={{ background: lv.bg, borderColor: lv.bc }}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                      </span>&lt;div className="scale-header"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                        </span>&lt;span className="scale-label" style={{ color: lv.tc }}&gt;{lv.label}&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                        </span>&lt;span className="scale-score" style={{ color: lv.tc }}&gt;{lv.score}&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                      </span>&lt;p className="scale-text" style={{ color: "#444" }}&gt;{lv.text}&lt;/p&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>))}</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>)}</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>))}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="legend"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;span style={{ color: "#888" }}&gt;Leyenda:&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;span className="legend-item"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;span className="rbadge base"&gt;Base&lt;/span&gt; Pilares originales expandidos</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;span className="legend-item"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;span className="rbadge nuevo"&gt;Nuevo&lt;/span&gt; Criterios añadidos desde frameworks de usabilidad</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>);</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">function EvaluadorTab() {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const [scores, setScores] = useState(() =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">    </span>try { return JSON.parse(localStorage.getItem("ux_scores") || "{}"); }</p>
-<p class="p3"><span class="Apple-converted-space">    </span>catch { return {}; }</p>
-<p class="p3"><span class="Apple-converted-space">  </span>});</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">    </span>localStorage.setItem("ux_scores", JSON.stringify(scores));</p>
-<p class="p3"><span class="Apple-converted-space">  </span>}, [scores]);</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>const answered<span class="Apple-converted-space">  </span>= Object.keys(scores).length;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const adjScore<span class="Apple-converted-space">  </span>= calcWeightedScore(scores);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const sc<span class="Apple-converted-space">        </span>= adjScore ? getScoreColor(parseFloat(adjScore)) : "#888";</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const sb<span class="Apple-converted-space">        </span>= adjScore ? getScoreBg(parseFloat(adjScore)) : "#F5F5F5";</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>function setScore(id, n) {</p>
-<p class="p3"><span class="Apple-converted-space">    </span>setScores(prev =&gt; ({ ...prev, [id]: n }));</p>
-<p class="p3"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3"><span class="Apple-converted-space">  </span>function reset() {</p>
-<p class="p3"><span class="Apple-converted-space">    </span>if (confirm("¿Reiniciar toda la evaluación?")) {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>setScores({});</p>
-<p class="p3"><span class="Apple-converted-space">      </span>localStorage.removeItem("ux_scores");</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p3"><span class="Apple-converted-space">  </span>}</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div className="eval-header"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="eval-top"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="eval-title"&gt;Evaluador Interactivo&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="eval-sub"&gt;Califica de 1 a 10 · Tu progreso se guarda automáticamente en este navegador&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>{adjScore &amp;&amp; (</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="score-display" style={{ borderColor: sc, background: sb }}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="score-v" style={{ color: sc }}&gt;{adjScore}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="score-label" style={{ color: sc }}&gt;Score Ponderado&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="score-sub"&gt;{answered}/{CRITERIA.length} evaluados&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>)}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>{CRITERIA.map(c =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="criterion-row" key={c.id}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="cr-info"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="cr-dot" style={{ background: c.color }} /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="cr-name"&gt;{c.name}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="cr-weight"&gt;Peso: {c.weight}%&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="btn-grid"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>{[1,2,3,4,5,6,7,8,9,10].map(n =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">              </span>const active = scores[c.id] === n;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;button</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>key={n}</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>className={`score-btn${active ? " active" : ""}`}</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>style={active ? { background: c.color, borderColor: c.color } : {}}</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>onClick={() =&gt; setScore(c.id, n)}</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&gt;{n}&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>);</p>
-<p class="p3"><span class="Apple-converted-space">            </span>})}</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{scores[c.id] &amp;&amp; &lt;ScoreBadge score={scores[c.id]} /&gt;}</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>))}</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>{answered &gt; 0 &amp;&amp; (</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="breakdown"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="breakdown-title"&gt;Desglose por criterio&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{CRITERIA.filter(c =&gt; scores[c.id]).map(c =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">            </span>const contrib = (scores[c.id] * c.weight) / 100;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="bd-row" key={c.id}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;span className="bd-name"&gt;{c.name}&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>&lt;span className="bd-calc"&gt;{scores[c.id]} × {c.weight}% = &lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                  </span>&lt;span className="bd-pts" style={{ color: c.color }}&gt;{contrib.toFixed(2)} pts&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>);</p>
-<p class="p3"><span class="Apple-converted-space">          </span>})}</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;button className="btn-reset" onClick={reset}&gt;↺ Reiniciar evaluación&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>)}</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>);</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">function FrameworkTab() {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const sorted = [...CRITERIA].sort((a, b) =&gt; b.weight - a.weight);</p>
-<p class="p3"><span class="Apple-converted-space">  </span>const maxW = 15;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>return (</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>{/* Weight bars */}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="fw-section"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="fw-title"&gt;Distribución de Pesos&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="fw-sub"&gt;Ordenados de mayor a menor · Los primeros 3 suman el 40% del score total&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>{sorted.map(c =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;div className="bar-row" key={c.id}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="bar-name"&gt;{c.name}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="bar-track"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="bar-fill" style={{</p>
-<p class="p3"><span class="Apple-converted-space">                </span>width: `${(c.weight / maxW) * 100}%`,</p>
-<p class="p3"><span class="Apple-converted-space">                </span>background: c.color,</p>
-<p class="p3"><span class="Apple-converted-space">              </span>}}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;span className="bar-pct"&gt;{c.weight}%&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="bar-dim" style={{ color: c.color, fontWeight: 600, fontSize: 11 }}&gt;{c.dim}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>))}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>{/* Justification */}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="fw-section"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="fw-title"&gt;Justificación Estratégica&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="fw-sub"&gt;Por qué estos criterios tienen mayor peso en contexto bancario-financiero&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="just-grid"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{JUSTIFICATIONS.map(j =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="just-card" key={j.pct}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="just-accent" style={{ background: j.color }} /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="just-inner"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-pct" style={{ color: j.color }}&gt;{j.pct}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-title"&gt;{j.title}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-sub"&gt;{j.sub}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-divider" /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-desc"&gt;{j.desc}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>))}</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p4"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>{/* Implementation steps */}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div className="fw-section"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="fw-title"&gt;Cómo Usar el Framework&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="fw-sub"&gt;Proceso recomendado de evaluación&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;div className="just-grid"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>{[</p>
-<p class="p3"><span class="Apple-converted-space">            </span>{ n:"01", color:"#C1272D", title:"Definir el Scope", desc:"Seleccionar la funcionalidad o flujo específico. Delimitar pantallas incluidas, perfil de usuario objetivo y contexto de uso." },</p>
-<p class="p3"><span class="Apple-converted-space">            </span>{ n:"02", color:"#1A5276", title:"Calificar los 10 Criterios", desc:"Usar la rúbrica para puntuar de 1-10. Documentar evidencia concreta (capturas, flows, datos) que justifique cada nota." },</p>
-<p class="p3"><span class="Apple-converted-space">            </span>{ n:"03", color:"#196F3D", title:"Calcular el Score Ponderado", desc:"Score ≥ 7.5 aprueba para producción. 5.0–7.4 requiere plan de mejora. Menor a 5.0 requiere rediseño." },</p>
-<p class="p3"><span class="Apple-converted-space">            </span>{ n:"04", color:"#784212", title:"Priorizar y Remediar", desc:"Mayor peso × menor score = máxima prioridad. Generar backlog con responsable, sprint asignado y métrica de éxito." },</p>
-<p class="p3"><span class="Apple-converted-space">          </span>].map(st =&gt; (</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;div className="just-card" key={st.n}&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="just-accent" style={{ background: st.color }} /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;div className="just-inner"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-pct" style={{ color: st.color }}&gt;{st.n}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-title"&gt;{st.title}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-divider" /&gt;</p>
-<p class="p3"><span class="Apple-converted-space">                </span>&lt;div className="just-desc"&gt;{st.desc}&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>))}</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>);</p>
-<p class="p3">}</p>
-<p class="p4"><br></p>
-<p class="p3">// ── APP ─────────────────────────────────────────────────────────────────────</p>
-<p class="p1">function App() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const [tab, setTab] = useState("rubric");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const tabs = [</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{ id: "rubric",<span class="Apple-converted-space">    </span>label: "📋 Rúbrica" <span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{ id: "evaluador", label: "🎯 Evaluador"<span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{ id: "framework", label: "🧠 Framework"<span class="Apple-converted-space">  </span>},</p>
-<p class="p1"><span class="Apple-converted-space">  </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;header className="site-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="header-inner"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="header-eyebrow"&gt;SCB · Design &amp;amp; Experience · v1.0&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h1 className="header-title"&gt;UX Feature Evaluation Framework&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;p className="header-sub"&gt;Rúbrica objetiva de 10 criterios para evaluación de funcionalidades digitales · Santander Consumer Perú&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="header-stats"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{[["10","Criterios"],["100%","Ponderado"],["1–10","Escala"],["≥7.5","Score mínimo"]].map(([v,l]) =&gt; (</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="hstat" key={l}&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="hstat-v"&gt;{v}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="hstat-l"&gt;{l}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>))}</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;nav className="tabs-bar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="tabs-inner"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>{tabs.map(t =&gt; (</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button</p>
-<p class="p1"><span class="Apple-converted-space">              </span>key={t.id}</p>
-<p class="p1"><span class="Apple-converted-space">              </span>className={`tab-btn${tab === t.id ? " active" : ""}`}</p>
-<p class="p1"><span class="Apple-converted-space">              </span>onClick={() =&gt; setTab(t.id)}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&gt;{t.label}&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/nav&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;main className="main"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>{tab === "rubric"<span class="Apple-converted-space">    </span>&amp;&amp; &lt;RubricTab /&gt;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>{tab === "evaluador" &amp;&amp; &lt;EvaluadorTab /&gt;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>{tab === "framework" &amp;&amp; &lt;FrameworkTab /&gt;}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/main&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;footer className="site-footer"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;span&gt;UX Evaluation Framework&lt;/span&gt; · SCB Design &amp;amp; Experience ·</p>
-<p class="p1"><span class="Apple-converted-space">        </span>Refs: Nielsen (1994) · Fogg (2002) · Kurosu (1995) · Baymard Institute (2023) · WCAG 2.1 · RAIL Model (Google)</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/footer&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">ReactDOM.createRoot(document.getElementById("root")).render(&lt;App /&gt;);</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const CRITERIA = [
+  {
+    id: 1, origin: "Base", weight: 15,
+    color: "#C1272D", dim: "Usabilidad",
+    name: "Fricción vs. Eficiencia",
+    heuristic: "Heurística Nielsen #7 · Hick's Law",
+    description: "Mide el coste real de completar una tarea: número de pasos, clics, tiempo y esfuerzo mental. Cada paso injustificado es fricción que puede costar una conversión.",
+    s1: "Tarea irrealizable o con más de 10 pasos innecesarios. El usuario abandona antes de completar el flujo. Impacto directo y medible en tasa de conversión.",
+    s5: "Tarea completable con esfuerzo moderado. Hay redundancias o pasos no justificados (5-6 pasos donde bastarían 3). Oportunidad de mejora clara.",
+    s10: "Flujo óptimo: mínimo de pasos, máxima claridad. Atajos disponibles para usuarios recurrentes. Cero fricción injustificada. Benchmark de referencia.",
+  },
+  {
+    id: 2, origin: "Nuevo", weight: 12,
+    color: "#C1272D", dim: "Usabilidad",
+    name: "Carga Cognitiva",
+    heuristic: "Miller's Law · Teoría de la Carga Cognitiva",
+    description: "Cantidad de información o decisiones simultáneas que el usuario debe procesar en pantalla. En contextos financieros, la carga cognitiva elevada genera abandono.",
+    s1: "Pantalla sobrecargada: más de 7 elementos de decisión simultáneos, texto denso sin jerarquía, múltiples llamadas a la acción compitiendo. El usuario no sabe qué hacer.",
+    s5: "Estructura aceptable pero con ruido visual. Algunas pantallas demandan más procesamiento del necesario. Sin progressive disclosure.",
+    s10: "Progressive disclosure aplicado correctamente. Cada pantalla expone solo lo esencial. Chunking y jerarquía tipográfica perfectos. El usuario siempre sabe cuál es el siguiente paso.",
+  },
+  {
+    id: 3, origin: "Nuevo", weight: 10,
+    color: "#C1272D", dim: "Usabilidad",
+    name: "Feedback y Visibilidad del Sistema",
+    heuristic: "Heurística Nielsen #1",
+    description: "El sistema comunica al usuario qué está ocurriendo en todo momento: estados de carga, confirmaciones, errores y progreso deben estar siempre presentes.",
+    s1: "Sin feedback de ningún tipo. El usuario no sabe si su acción fue registrada. No existen estados de carga, confirmación ni error. Las transacciones parecen desaparecer.",
+    s5: "Feedback parcial: hay loaders en algunos flujos pero ausentes en otros. Mensajes genéricos ('Error') sin contexto ni acción sugerida.",
+    s10: "Todos los estados están diseñados: loading, éxito, error, vacío, estado parcial. Mensajes accionables con causa + solución. Micro-animaciones refuerzan la respuesta del sistema.",
+  },
+  {
+    id: 4, origin: "Nuevo", weight: 13,
+    color: "#8B1A1A", dim: "Resiliencia",
+    name: "Prevención y Recuperación de Errores",
+    heuristic: "Heurística Nielsen #5 y #9",
+    description: "El sistema evita errores antes de que ocurran y ofrece rutas claras de recuperación cuando suceden. En banca, un error sin salida = cliente perdido.",
+    s1: "Sin validación de ningún tipo. Los errores ocurren silenciosamente o con mensajes técnicos inútiles. Sin opción de deshacer acciones. Flujos destructivos sin confirmación.",
+    s5: "Validación básica presente (campos requeridos). Los errores se reportan pero sin guía específica de resolución. Sin confirmación antes de acciones irreversibles.",
+    s10: "Validación inline en tiempo real con indicadores positivos. Errores con causa + solución específica. Confirmación obligatoria antes de acciones destructivas. Undo disponible donde aplica.",
+  },
+  {
+    id: 5, origin: "Base", weight: 8,
+    color: "#1A5276", dim: "Consistencia",
+    name: "Adherencia al Design System",
+    heuristic: "Heurística Nielsen #4 · Atomic Design",
+    description: "Uso de componentes estándar del sistema de diseño vs. soluciones custom no documentadas. La consistencia reduce la carga cognitiva y acelera el desarrollo.",
+    s1: "Componentes inventados en cada pantalla sin relación con el DS. Cada pantalla parece diseñada por una persona diferente. Imposible mantener o escalar.",
+    s5: "Uso parcial del DS. Algunos componentes correctos, otros custom sin justificación documentada. Inconsistencias de spacing, color o tipografía en detalles.",
+    s10: "100% componentes del DS o desviaciones formalmente documentadas con justificación de negocio aprobada. Todos los tokens de color, tipografía y espaciado son correctos.",
+  },
+  {
+    id: 6, origin: "Nuevo", weight: 10,
+    color: "#196F3D", dim: "Inclusión",
+    name: "Accesibilidad (WCAG 2.1)",
+    heuristic: "WCAG 2.1 · ISO 9241-171",
+    description: "Cumplimiento de estándares de accesibilidad: contraste de color, navegación por teclado, compatibilidad con lectores de pantalla y tamaños táctiles mínimos.",
+    s1: "Falla criterios AA básicos: ratio de contraste inferior a 3:1, sin alt-text en imágenes funcionales, imposible navegar con teclado. Excluye a usuarios con discapacidad.",
+    s5: "Cumple algunos criterios AA pero falla en interacciones complejas (dropdowns, modales, formularios dinámicos). Sin pruebas con lectores de pantalla reales.",
+    s10: "Cumplimiento AA completo verificado con herramientas (Axe, Lighthouse >95). Tamaños táctiles mínimos de 44px. ARIA labels completos. Probado con lectores de pantalla.",
+  },
+  {
+    id: 7, origin: "Base", weight: 7,
+    color: "#6C3483", dim: "Visual",
+    name: "Estética Funcional",
+    heuristic: "Aesthetic-Usability Effect · Principios Gestalt",
+    description: "El diseño es visualmente atractivo Y sirve un propósito funcional. La belleza que no ayuda a la comprensión, estorba. Cada decisión visual debe tener intención.",
+    s1: "Desorden visual. Inconsistencia cromática, tipografía ilegible, elementos decorativos que compiten con el contenido útil. El usuario no sabe qué es importante.",
+    s5: "Visualmente aceptable pero plano. Sin jerarquía clara ni distinción entre pantallas o funcionalidades importantes. El diseño no comunica prioridad.",
+    s10: "Cada decisión visual tiene intención funcional. Jerarquía cristalina: el usuario sabe qué es importante sin tener que pensarlo. La belleza y la función son inseparables.",
+  },
+  {
+    id: 8, origin: "Base", weight: 10,
+    color: "#1565C0", dim: "Flexibilidad",
+    name: "Adaptabilidad Contextual",
+    heuristic: "User-Centered Design · Role-Based UX",
+    description: "El flujo y la experiencia se adaptan al tipo de usuario (nuevo, recurrente, agente) y al contexto (dispositivo, idioma, regulación, estado del cliente).",
+    s1: "Flujo único e idéntico para todos los perfiles. Un cliente nuevo ve exactamente la misma pantalla que uno con 5 años de antigüedad. Sin ninguna adaptación.",
+    s5: "Personalización básica (saludo con nombre, datos pre-llenados). Los flujos críticos son idénticos independientemente del perfil o historial del cliente.",
+    s10: "Flujos diferenciados por segmento. Onboarding progresivo para nuevos. Atajos inteligentes para recurrentes. Adaptación regulatoria por producto y adaptación de dispositivo completa.",
+  },
+  {
+    id: 9, origin: "Nuevo", weight: 10,
+    color: "#784212", dim: "Confianza",
+    name: "Credibilidad y Trust Signals",
+    heuristic: "Fogg's Credibility Model · BJ Fogg",
+    description: "El diseño refuerza activamente la confianza del usuario en cada punto de decisión: transparencia de información, señales de seguridad y lenguaje honesto.",
+    s1: "Lenguaje confuso, ambiguo o alarmante. Sin señales de seguridad en pantallas críticas (pagos, datos personales). El usuario activamente desconfía del producto.",
+    s5: "Íconos de candado presentes pero aislados del contexto. El copy no explica claramente qué datos se usan ni por qué. Trust como decoración, no como sistema.",
+    s10: "Trust integrado al flujo en cada punto de fricción. Microcopy honesto sobre costos, datos y procesos. Cero letra chica sorpresa. Transparencia proactiva antes de que el usuario pregunte.",
+  },
+  {
+    id: 10, origin: "Nuevo", weight: 5,
+    color: "#0B5345", dim: "Rendimiento",
+    name: "Rendimiento Percibido",
+    heuristic: "Core Web Vitals · RAIL Model (Google)",
+    description: "La percepción del usuario sobre la velocidad del sistema, independientemente del tiempo real de carga. El rendimiento percibido puede optimizarse sin tocar el backend.",
+    s1: "Pantallas en blanco durante la carga. Sin skeleton screens ni indicadores de progreso. El usuario no sabe si la app está funcionando o se colgó.",
+    s5: "Loaders genéricos (spinners) presentes en algunos flujos. La espera se percibe larga aunque el tiempo real sea aceptable. Sin optimistic UI.",
+    s10: "Skeleton screens en toda carga de datos. Optimistic UI donde aplica. Prefetching de pantallas probables. La app se siente instantánea. LCP percibido por debajo de 2.5s.",
+  },
+];
+
+const JUSTIFICATIONS = [
+  {
+    pct: "28%", color: "#C1272D",
+    title: "Fricción + Prevención de Errores",
+    sub: "Impacto directo en conversión",
+    desc: "Cada paso adicional en onboarding reduce la tasa de completación entre 10-15%. Un error sin recuperación clara genera abandono irreversible y daño reputacional. (Baymard Institute, 2023)",
+  },
+  {
+    pct: "22%", color: "#E05C00",
+    title: "Carga Cognitiva + Feedback",
+    sub: "Fricción silenciosa y costos operativos",
+    desc: "En contextos de ansiedad financiera, pantallas sobrecargadas disparan abandono. Sin feedback claro, se generan doble-clics, transacciones duplicadas y llamadas a soporte con costo operativo medible.",
+  },
+  {
+    pct: "20%", color: "#196F3D",
+    title: "Credibilidad + Accesibilidad",
+    sub: "Regulación y percepción de seguridad",
+    desc: "La credibilidad percibida determina si el usuario procede (Fogg, 2002). La EU Accessibility Act 2025 y regulaciones SBS hacen de la accesibilidad un riesgo legal, no solo de UX.",
+  },
+  {
+    pct: "30%", color: "#1A5276",
+    title: "DS + Estética + Adaptabilidad + Rendimiento",
+    sub: "Calidad de producto y escalabilidad",
+    desc: "Peso moderado porque son multiplicadores: el Design System correcto acelera al equipo, pero un componente custom bien justificado puede superar a uno del DS mal aplicado.",
+  },
+];
+
+function getScoreColor(s) {
+  if (!s) return "#888";
+  if (s >= 8) return "#196F3D";
+  if (s >= 5) return "#E67E22";
+  return "#C1272D";
+}
+function getScoreBg(s) {
+  if (!s) return "#F5F5F5";
+  if (s >= 8) return "#EAFAF1";
+  if (s >= 5) return "#FEF9E7";
+  return "#FDEDEC";
+}
+function calcWeightedScore(scores) {
+  let answered = CRITERIA.filter(c => scores[c.id]);
+  if (!answered.length) return null;
+  let totalWeight = answered.reduce((a, c) => a + c.weight, 0);
+  let weighted    = answered.reduce((a, c) => a + (scores[c.id] * c.weight), 0);
+  return (weighted / totalWeight).toFixed(1);
+}
+
+function WeightBar({ weight, color }) {
+  return (
+    <div className="wbar-wrap">
+      <div className="wbar" style={{ width: weight * 4, background: color, opacity: 0.85 }} />
+      <span className="wbar-pct">{weight}%</span>
+    </div>
+  );
+}
+
+function ScoreBadge({ score }) {
+  if (!score) return null;
+  const c = getScoreColor(score);
+  const b = getScoreBg(score);
+  return (
+    <span className="score-badge" style={{ color: c, background: b, borderColor: c }}>
+      {score}/10
+    </span>
+  );
+}
+
+function RubricTab() {
+  const [expanded, setExpanded] = useState(null);
+  const toggle = (id) => setExpanded(expanded === id ? null : id);
+
+  return (
+    <div>
+      <div className="summary-grid">
+        {[
+          { v: "10", l: "Criterios evaluados" },
+          { v: "100%", l: "Peso total distribuido" },
+          { v: "1–10", l: "Escala · 1=falla · 10=excelente" },
+        ].map(c => (
+          <div className="scard" key={c.v}>
+            <div className="scard-v">{c.v}</div>
+            <div className="scard-l">{c.l}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="rubric-table">
+        <div className="rtable-header">
+          <div className="rth">#</div>
+          <div className="rth">Criterio · Heurística</div>
+          <div className="rth">Peso</div>
+          <div className="rth right">Expandir</div>
+        </div>
+
+        {CRITERIA.map((c, idx) => (
+          <div key={c.id}>
+            <div
+              className={`rrow${expanded === c.id ? " expanded" : ""}`}
+              onClick={() => toggle(c.id)}
+              style={{ background: expanded === c.id ? "#FAFAF8" : idx % 2 === 0 ? "#fff" : "#FDFCFA" }}
+            >
+              <div className="rnum" style={{ background: c.color }}>{String(c.id).padStart(2,"0")}</div>
+              <div>
+                <div className="rname">
+                  {c.name}
+                  <span className={`rbadge ${c.origin === "Base" ? "base" : "nuevo"}`}>{c.origin}</span>
+                </div>
+                <div className="rheuristic">{c.heuristic}</div>
+              </div>
+              <WeightBar weight={c.weight} color={c.color} />
+              <div className="rtoggle">{expanded === c.id ? "▲ cerrar" : "▼ ver escala"}</div>
+            </div>
+
+            {expanded === c.id && (
+              <div className="rexpand">
+                <p className="rdesc">{c.description}</p>
+                <div className="scale-grid">
+                  {[
+                    { score: 1,  label: "Falla Crítica",    bg:"#FEF2F2", bc:"#E74C3C", tc:"#922B21", text: c.s1 },
+                    { score: 5,  label: "Funcional Básico", bg:"#FEF9E7", bc:"#F39C12", tc:"#7D6608", text: c.s5 },
+                    { score: 10, label: "Excelencia UX",    bg:"#EAFAF1", bc:"#27AE60", tc:"#1E8449", text: c.s10 },
+                  ].map(lv => (
+                    <div className="scale-card" key={lv.score}
+                      style={{ background: lv.bg, borderColor: lv.bc }}>
+                      <div className="scale-header">
+                        <span className="scale-label" style={{ color: lv.tc }}>{lv.label}</span>
+                        <span className="scale-score" style={{ color: lv.tc }}>{lv.score}</span>
+                      </div>
+                      <p className="scale-text" style={{ color: "#444" }}>{lv.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="legend">
+        <span style={{ color: "#888" }}>Leyenda:</span>
+        <span className="legend-item">
+          <span className="rbadge base">Base</span> Pilares originales expandidos
+        </span>
+        <span className="legend-item">
+          <span className="rbadge nuevo">Nuevo</span> Criterios añadidos desde frameworks de usabilidad
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function EvaluadorTab() {
+  const [scores, setScores] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("ux_scores") || "{}"); }
+    catch { return {}; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("ux_scores", JSON.stringify(scores));
+  }, [scores]);
+
+  const answered  = Object.keys(scores).length;
+  const adjScore  = calcWeightedScore(scores);
+  const sc        = adjScore ? getScoreColor(parseFloat(adjScore)) : "#888";
+  const sb        = adjScore ? getScoreBg(parseFloat(adjScore)) : "#F5F5F5";
+
+  function setScore(id, n) {
+    setScores(prev => ({ ...prev, [id]: n }));
+  }
+  function reset() {
+    if (confirm("¿Reiniciar toda la evaluación?")) {
+      setScores({});
+      localStorage.removeItem("ux_scores");
+    }
+  }
+
+  return (
+    <div className="eval-header">
+      <div className="eval-top">
+        <div>
+          <div className="eval-title">Evaluador Interactivo</div>
+          <div className="eval-sub">Califica de 1 a 10 · Tu progreso se guarda automáticamente en este navegador</div>
+        </div>
+        {adjScore && (
+          <div className="score-display" style={{ borderColor: sc, background: sb }}>
+            <div className="score-v" style={{ color: sc }}>{adjScore}</div>
+            <div className="score-label" style={{ color: sc }}>Score Ponderado</div>
+            <div className="score-sub">{answered}/{CRITERIA.length} evaluados</div>
+          </div>
+        )}
+      </div>
+
+      {CRITERIA.map(c => (
+        <div className="criterion-row" key={c.id}>
+          <div className="cr-info">
+            <div className="cr-dot" style={{ background: c.color }} />
+            <div>
+              <div className="cr-name">{c.name}</div>
+              <div className="cr-weight">Peso: {c.weight}%</div>
+            </div>
+          </div>
+          <div className="btn-grid">
+            {[1,2,3,4,5,6,7,8,9,10].map(n => {
+              const active = scores[c.id] === n;
+              return (
+                <button
+                  key={n}
+                  className={`score-btn${active ? " active" : ""}`}
+                  style={active ? { background: c.color, borderColor: c.color } : {}}
+                  onClick={() => setScore(c.id, n)}
+                >{n}</button>
+              );
+            })}
+          </div>
+          {scores[c.id] && <ScoreBadge score={scores[c.id]} />}
+        </div>
+      ))}
+
+      {answered > 0 && (
+        <div className="breakdown">
+          <div className="breakdown-title">Desglose por criterio</div>
+          {CRITERIA.filter(c => scores[c.id]).map(c => {
+            const contrib = (scores[c.id] * c.weight) / 100;
+            return (
+              <div className="bd-row" key={c.id}>
+                <span className="bd-name">{c.name}</span>
+                <span>
+                  <span className="bd-calc">{scores[c.id]} × {c.weight}% = </span>
+                  <span className="bd-pts" style={{ color: c.color }}>{contrib.toFixed(2)} pts</span>
+                </span>
+              </div>
+            );
+          })}
+          <button className="btn-reset" onClick={reset}>↺ Reiniciar evaluación</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FrameworkTab() {
+  const sorted = [...CRITERIA].sort((a, b) => b.weight - a.weight);
+  const maxW = 15;
+
+  return (
+    <div>
+      <div className="fw-section">
+        <div className="fw-title">Distribución de Pesos</div>
+        <div className="fw-sub">Ordenados de mayor a menor · Los primeros 3 suman el 40% del score total</div>
+        {sorted.map(c => (
+          <div className="bar-row" key={c.id}>
+            <div className="bar-name">{c.name}</div>
+            <div className="bar-track">
+              <div className="bar-fill" style={{
+                width: `${(c.weight / maxW) * 100}%`,
+                background: c.color,
+              }}>
+                <span className="bar-pct">{c.weight}%</span>
+              </div>
+            </div>
+            <div className="bar-dim" style={{ color: c.color, fontWeight: 600, fontSize: 11 }}>{c.dim}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="fw-section">
+        <div className="fw-title">Justificación Estratégica</div>
+        <div className="fw-sub">Por qué estos criterios tienen mayor peso en contexto bancario-financiero</div>
+        <div className="just-grid">
+          {JUSTIFICATIONS.map(j => (
+            <div className="just-card" key={j.pct}>
+              <div className="just-accent" style={{ background: j.color }} />
+              <div className="just-inner">
+                <div className="just-pct" style={{ color: j.color }}>{j.pct}</div>
+                <div className="just-title">{j.title}</div>
+                <div className="just-sub">{j.sub}</div>
+                <div className="just-divider" />
+                <div className="just-desc">{j.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="fw-section">
+        <div className="fw-title">Cómo Usar el Framework</div>
+        <div className="fw-sub">Proceso recomendado de evaluación</div>
+        <div className="just-grid">
+          {[
+            { n:"01", color:"#C1272D", title:"Definir el Scope", desc:"Seleccionar la funcionalidad o flujo específico. Delimitar pantallas incluidas, perfil de usuario objetivo y contexto de uso." },
+            { n:"02", color:"#1A5276", title:"Calificar los 10 Criterios", desc:"Usar la rúbrica para puntuar de 1-10. Documentar evidencia concreta (capturas, flows, datos) que justifique cada nota." },
+            { n:"03", color:"#196F3D", title:"Calcular el Score Ponderado", desc:"Score ≥ 7.5 aprueba para producción. 5.0–7.4 requiere plan de mejora. Menor a 5.0 requiere rediseño." },
+            { n:"04", color:"#784212", title:"Priorizar y Remediar", desc:"Mayor peso × menor score = máxima prioridad. Generar backlog con responsable, sprint asignado y métrica de éxito." },
+          ].map(st => (
+            <div className="just-card" key={st.n}>
+              <div className="just-accent" style={{ background: st.color }} />
+              <div className="just-inner">
+                <div className="just-pct" style={{ color: st.color }}>{st.n}</div>
+                <div className="just-title">{st.title}</div>
+                <div className="just-divider" />
+                <div className="just-desc">{st.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tab, setTab] = useState("rubric");
+  const tabs = [
+    { id: "rubric",    label: "📋 Rúbrica"  },
+    { id: "evaluador", label: "🎯 Evaluador" },
+    { id: "framework", label: "🧠 Framework" },
+  ];
+
+  return (
+    <>
+      <header className="site-header">
+        <div className="header-inner">
+          <div className="header-eyebrow">SCB · Design &amp; Experience · v1.0</div>
+          <h1 className="header-title">UX Feature Evaluation Framework</h1>
+          <p className="header-sub">Rúbrica objetiva de 10 criterios para evaluación de funcionalidades digitales · Santander Consumer Perú</p>
+          <div className="header-stats">
+            {[["10","Criterios"],["100%","Ponderado"],["1–10","Escala"],["≥7.5","Score mínimo"]].map(([v,l]) => (
+              <div className="hstat" key={l}>
+                <div className="hstat-v">{v}</div>
+                <div className="hstat-l">{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <nav className="tabs-bar">
+        <div className="tabs-inner">
+          {tabs.map(t => (
+            <button
+              key={t.id}
+              className={`tab-btn${tab === t.id ? " active" : ""}`}
+              onClick={() => setTab(t.id)}
+            >{t.label}</button>
+          ))}
+        </div>
+      </nav>
+
+      <main className="main">
+        {tab === "rubric"    && <RubricTab />}
+        {tab === "evaluador" && <EvaluadorTab />}
+        {tab === "framework" && <FrameworkTab />}
+      </main>
+
+      <footer className="site-footer">
+        <span>UX Evaluation Framework</span> · SCB Design &amp; Experience ·
+        Refs: Nielsen (1994) · Fogg (2002) · Kurosu (1995) · Baymard Institute (2023) · WCAG 2.1 · RAIL Model (Google)
+      </footer>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
 </body>
 </html>

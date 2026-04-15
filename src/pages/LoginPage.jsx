@@ -42,7 +42,7 @@ export default function LoginPage() {
         // After clicking the magic link the browser opens the app root;
         // the Supabase client picks up the token from the URL automatically.
         emailRedirectTo: window.location.origin,
-        shouldCreateUser: false,  // only pre-invited users can sign in
+        shouldCreateUser: true,
       },
     })
 

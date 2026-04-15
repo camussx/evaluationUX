@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #0F1117;
+    color: #F0F2F7;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /* Rubric table: fixed-column grid — desktop */
+  .rubric-grid {
+    display: grid;
+    grid-template-columns: 36px 1fr 80px 100px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Rubric table: narrower columns on small screens */
+  @media (max-width: 640px) {
+    .rubric-grid {
+      grid-template-columns: 28px 1fr 60px 70px;
+    }
+  }
+
+  /* Score button hover state (plain HTML button resets) */
+  .score-btn:hover:not(.score-btn--active) {
+    border-color: #4F8EF7 !important;
+    color: #93B4FA !important;
+  }
+}

@@ -11,6 +11,19 @@ import { useAuth } from '../hooks/useAuth'
 // a magic link, clicks it, lands here (or on the app root), and chooses their
 // role on the RoleSelector screen (rendered by ProtectedRoute).
 
+// ── Error messages ────────────────────────────────────────────────────────────
+
+function humanizeAuthError(raw = '') {
+  const msg = raw.toLowerCase()
+  if (msg.includes('signups not allowed'))
+    return 'Este correo no está registrado en la plataforma. Contacta al administrador para solicitar acceso.'
+  if (msg.includes('invalid login credentials'))
+    return 'Correo o enlace inválido. Solicita un nuevo acceso.'
+  if (msg.includes('email rate limit exceeded') || msg.includes('rate limit'))
+    return 'Demasiados intentos. Espera unos minutos antes de volver a intentarlo.'
+  return 'Ocurrió un problema al iniciar sesión. Intenta de nuevo o contacta al administrador.'
+}
+
 export default function LoginPage() {
   const { user, loading } = useAuth()
   const navigate          = useNavigate()
@@ -47,7 +60,7 @@ export default function LoginPage() {
     })
 
     if (error) {
-      setErrMsg(error.message)
+      setErrMsg(humanizeAuthError(error.message))
       setStatus('error')
     } else {
       setStatus('sent')

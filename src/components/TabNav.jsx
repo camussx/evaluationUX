@@ -2,10 +2,9 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 const TABS = [
-  { to: '/',          label: '📋 Rúbrica',   end: true },
-  { to: '/evaluador', label: '🎯 Evaluador',  roles: ['admin', 'evaluador'] },
-  { to: '/framework', label: '🧠 Framework'            },
-  { to: '/flows',     label: '📂 Flujos'               },
+  { to: '/',           label: '📂 Flujos',    end: true                       },
+  { to: '/referencia', label: '📋 Referencia'                                 },
+  { to: '/admin',      label: '⚙️ Admin',     roles: ['admin']                },
 ]
 
 const ROLE_META = {
@@ -17,7 +16,7 @@ const ROLE_META = {
 export default function TabNav() {
   const { user, role, signOut } = useAuth()
 
-  // Hide tabs the current role cannot access (they'd hit AccessDenied anyway)
+  // Hide tabs the current role cannot access
   const visibleTabs = TABS.filter(t => !t.roles || !role || t.roles.includes(role))
 
   const meta = ROLE_META[role] ?? null
@@ -47,7 +46,7 @@ export default function TabNav() {
           </NavLink>
         ))}
 
-        {/* ── Right: user info + sign-out (only when logged in) ── */}
+        {/* ── Right: user info + sign-out ── */}
         {user && (
           <div className="ml-auto flex items-center gap-3 pl-4 pr-3 flex-shrink-0">
             {/* Role badge */}
@@ -55,9 +54,9 @@ export default function TabNav() {
               <span
                 className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
                 style={{
-                  color:        meta.color,
-                  borderColor:  meta.color,
-                  background:   `${meta.color}18`,
+                  color:       meta.color,
+                  borderColor: meta.color,
+                  background:  `${meta.color}18`,
                 }}
               >
                 {meta.label}
@@ -69,7 +68,7 @@ export default function TabNav() {
               {user.email}
             </span>
 
-            {/* Sign-out button */}
+            {/* Sign-out */}
             <button
               onClick={signOut}
               title="Cerrar sesión"

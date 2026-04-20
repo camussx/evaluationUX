@@ -11,14 +11,21 @@ function getLatestEval(evaluations = []) {
   )[0]
 }
 
-/** Attach lastScore and lastEvaluatedAt to each flow object. */
+/** Attach lastScore, lastEvaluatedAt, evalCount and avgScore to each flow. */
 function enrichFlows(flows) {
   return flows.map(f => {
-    const latest = getLatestEval(f.evaluations)
+    const evals  = f.evaluations ?? []
+    const latest = getLatestEval(evals)
+    const evalCount = evals.length
+    const avgScore  = evalCount > 0
+      ? (evals.reduce((s, e) => s + parseFloat(e.overall_score), 0) / evalCount).toFixed(1)
+      : null
     return {
       ...f,
-      lastScore: latest?.overall_score ?? null,
+      lastScore:      latest?.overall_score ?? null,
       lastEvaluatedAt: latest?.evaluated_at ?? null,
+      evalCount,
+      avgScore,
     }
   })
 }

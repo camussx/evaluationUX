@@ -36,6 +36,22 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  // 3. Keep the profiles table in sync whenever the user or role changes.
+  //    profiles is used by AdminPage to list known users without hitting auth.users.
+  useEffect(() => {
+    const u = session?.user
+    if (!u) return
+    supabase.from('profiles').upsert(
+      {
+        id:         u.id,
+        email:      u.email,
+        role:       u.user_metadata?.role ?? null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' }
+    ).then(() => {})   // fire-and-forget; errors are non-critical
+  }, [session?.user?.id, session?.user?.email, session?.user?.user_metadata?.role])
+
   // ── Derived values ──────────────────────────────────────────────────────────
 
   const user = session?.user ?? null

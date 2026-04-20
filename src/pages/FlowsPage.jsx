@@ -30,25 +30,25 @@ function SkeletonCard() {
 // ── Flow card ────────────────────────────────────────────────────────────────
 
 function FlowCard({ flow, onClick }) {
-  const sc = getScoreColor(flow.lastScore)
-  const sb = getScoreBg(flow.lastScore)
+  const sc = getScoreColor(flow.avgScore)
+  const sb = getScoreBg(flow.avgScore)
 
   return (
     <button
       onClick={onClick}
       className="w-full text-left bg-background-surface border border-border-default rounded-xl p-5 transition-all duration-200 hover:border-accent/60 hover:bg-background-elevated group focus:outline-none focus:ring-2 focus:ring-accent/50"
     >
-      {/* Top row: product tag + score badge */}
+      {/* Top row: product tag + avg score badge */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <span className="text-[10px] font-bold tracking-widest uppercase text-text-hint">
           {flow.product || 'Sin producto'}
         </span>
-        {flow.lastScore != null ? (
+        {flow.avgScore != null ? (
           <span
             className="font-mono text-[12px] font-bold px-2 py-0.5 rounded border flex-shrink-0"
             style={{ color: sc, background: sb, borderColor: sc }}
           >
-            {parseFloat(flow.lastScore).toFixed(1)}/10
+            {flow.avgScore}/10
           </span>
         ) : (
           <span className="text-[10px] text-text-hint italic flex-shrink-0">Sin evaluar</span>
@@ -62,21 +62,31 @@ function FlowCard({ flow, onClick }) {
 
       {/* Description */}
       {flow.description && (
-        <p className="text-[12px] text-text-hint mb-4 leading-relaxed line-clamp-2">
+        <p className="text-[12px] text-text-hint mb-3 leading-relaxed line-clamp-2">
           {flow.description}
         </p>
       )}
 
-      {/* Footer: last evaluation date or creation date */}
-      <div className="flex items-center justify-between mt-auto pt-2 border-t border-border-default">
-        <span className="text-[11px] text-text-hint">
-          {flow.lastEvaluatedAt
-            ? `Última eval: ${fmtDate(flow.lastEvaluatedAt)}`
-            : `Creado: ${fmtDate(flow.created_at)}`}
-        </span>
-        <span className="text-accent text-[12px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-          Ver →
-        </span>
+      {/* Stats row */}
+      <div className="flex items-center gap-4 mt-auto pt-3 border-t border-border-default">
+        <div>
+          <div className="font-mono text-[14px] font-bold" style={{ color: sc }}>
+            {flow.avgScore ?? '—'}
+          </div>
+          <div className="text-[10px] text-text-hint uppercase tracking-wider">Promedio</div>
+        </div>
+        <div>
+          <div className="font-mono text-[14px] font-bold text-text-primary">{flow.evalCount}</div>
+          <div className="text-[10px] text-text-hint uppercase tracking-wider">Evaluaciones</div>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-[11px] text-text-hint">
+            {flow.lastEvaluatedAt
+              ? fmtDate(flow.lastEvaluatedAt)
+              : `Creado ${fmtDate(flow.created_at)}`}
+          </span>
+          <span className="text-accent text-[12px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+        </div>
       </div>
     </button>
   )

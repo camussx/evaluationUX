@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider } from './hooks/useAuth'
-import Header from './components/Header'
-import TabNav from './components/TabNav'
+import AppHeader from './components/AppHeader'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
-import ReferencePage from './pages/ReferencePage'
-import EvaluadorTab from './pages/EvaluadorTab'
-import FlowsPage from './pages/FlowsPage'
-import FlowDetailPage from './pages/FlowDetailPage'
+import DashboardPage from './pages/DashboardPage'
+import FlujosPage from './pages/FlujosPage'
+import FlujosDetailPage from './pages/FlujosDetailPage'
+import EvaluarPage from './pages/EvaluarPage'
+import CriteriosPage from './pages/CriteriosPage'
 import AdminPage from './pages/AdminPage'
 
 // ── Shared layout ─────────────────────────────────────────────────────────────
@@ -15,20 +15,11 @@ import AdminPage from './pages/AdminPage'
 function AppLayout() {
   return (
     <div className="min-h-screen bg-background-base text-text-primary">
-      <Header />
-      <TabNav />
+      <AppHeader />
 
-      <main className="max-w-[920px] mx-auto px-4 pt-7 pb-16">
+      <main className="max-w-[960px] mx-auto px-4 pt-8 pb-20">
         <Outlet />
       </main>
-
-      <footer
-        className="border-t border-border-default text-center py-3.5 px-4 text-[11px] text-text-hint"
-        style={{ background: '#1A1D27' }}
-      >
-        UX Evaluation Framework · SCB Design &amp; Experience ·{' '}
-        Refs: Nielsen (1994) · Fogg (2002) · Kurosu (1995) · Baymard Institute (2023) · WCAG 2.1 · RAIL Model (Google)
-      </footer>
     </div>
   )
 }
@@ -43,44 +34,45 @@ export default function App() {
           {/* ── Public ── */}
           <Route path="/login" element={<LoginPage />} />
 
-          {/* ── Protected (all share the Header + TabNav layout) ── */}
+          {/* ── Protected ── */}
           <Route element={<AppLayout />}>
 
-            {/* Dashboard: FlowsPage as landing */}
+            {/* Dashboard — landing */}
             <Route path="/" element={
-              <ProtectedRoute><FlowsPage /></ProtectedRoute>
+              <ProtectedRoute><DashboardPage /></ProtectedRoute>
             } />
 
-            {/* Redirect legacy /flows to root */}
-            <Route path="/flows" element={<Navigate to="/" replace />} />
-
-            {/* Flow detail + evaluate */}
-            <Route path="/flows/:id" element={
-              <ProtectedRoute><FlowDetailPage /></ProtectedRoute>
+            {/* Flujos */}
+            <Route path="/flujos" element={
+              <ProtectedRoute><FlujosPage /></ProtectedRoute>
             } />
-            <Route path="/flows/:id/evaluate" element={
+            <Route path="/flujos/:id" element={
+              <ProtectedRoute><FlujosDetailPage /></ProtectedRoute>
+            } />
+            <Route path="/flujos/:id/evaluar" element={
               <ProtectedRoute allowedRoles={['admin', 'evaluador']}>
-                <EvaluadorTab />
+                <EvaluarPage />
               </ProtectedRoute>
             } />
 
-            {/* Reference: merged Rúbrica + Framework */}
-            <Route path="/referencia" element={
-              <ProtectedRoute><ReferencePage /></ProtectedRoute>
+            {/* Criterios */}
+            <Route path="/criterios" element={
+              <ProtectedRoute><CriteriosPage /></ProtectedRoute>
             } />
 
-            {/* Admin: evaluator permissions — admin only */}
+            {/* Admin */}
             <Route path="/admin" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminPage />
               </ProtectedRoute>
             } />
 
-            {/* Redirect legacy standalone evaluador route */}
-            <Route path="/evaluador" element={<Navigate to="/" replace />} />
-
-            {/* Redirect legacy framework tab */}
-            <Route path="/framework" element={<Navigate to="/referencia" replace />} />
+            {/* ── Legacy redirects ── */}
+            <Route path="/flows"           element={<Navigate to="/flujos"    replace />} />
+            <Route path="/flows/:id"       element={<Navigate to="/"          replace />} />
+            <Route path="/referencia"      element={<Navigate to="/criterios" replace />} />
+            <Route path="/framework"       element={<Navigate to="/criterios" replace />} />
+            <Route path="/evaluador"       element={<Navigate to="/"          replace />} />
 
           </Route>
         </Routes>

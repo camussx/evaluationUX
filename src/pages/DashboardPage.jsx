@@ -40,7 +40,7 @@ export default function DashboardPage() {
           Aún no tienes flujos evaluados
         </p>
         <button
-          onClick={() => navigate('/flujos')}
+          onClick={() => navigate('/flujos', { state: { openModal: true } })}
           className="px-5 py-2.5 bg-accent text-background-base text-[13px] font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
           + Nuevo flujo
@@ -56,7 +56,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-6 gap-4">
         <h1 className="text-[22px] font-bold text-text-primary">Evaluaciones realizadas</h1>
         <button
-          onClick={() => navigate('/flujos')}
+          onClick={() => navigate('/flujos', { state: { openModal: true } })}
           className="flex-shrink-0 px-4 py-2 bg-accent text-background-base text-[13px] font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
           + Nuevo flujo

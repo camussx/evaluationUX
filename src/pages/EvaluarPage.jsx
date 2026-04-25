@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate, useBlocker } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { CRITERIA } from '../data/criteria'
 import { getScoreColor, getScoreBg, calcWeightedScore } from '../utils/scoring'
@@ -118,19 +118,16 @@ function EvaluarForm({ flowId, navigate, user }) {
   const sc        = adjScore ? getScoreColor(parseFloat(adjScore)) : '#6B7280'
   const sb        = adjScore ? getScoreBg(parseFloat(adjScore))    : 'rgba(34,38,58,0.5)'
 
-  // ── Navigation guard (useBlocker) ─────────────────────────────────────────
-  const isDirty = answered > 0 && saveStatus !== 'saved'
-  const blocker  = useBlocker(isDirty)
-
+  // ── Navigation guard (beforeunload only — useBlocker requires data router) ──
   useEffect(() => {
     const handler = (e) => {
-      if (!isDirty) return
+      if (answered === 0 || saveStatus === 'saved') return
       e.preventDefault()
       e.returnValue = ''
     }
     window.addEventListener('beforeunload', handler)
     return () => window.removeEventListener('beforeunload', handler)
-  }, [isDirty])
+  }, [answered, saveStatus])
 
   // ── Actions ───────────────────────────────────────────────────────────────
   function setScore(criterionId, n) {
@@ -239,36 +236,6 @@ function EvaluarForm({ flowId, navigate, user }) {
   // ── Main evaluation form ──────────────────────────────────────────────────
   return (
     <div>
-      {/* Unsaved changes dialog */}
-      {blocker?.state === 'blocked' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => blocker.reset?.()}
-          />
-          <div className="relative bg-background-surface border border-border-default rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-[16px] font-bold text-text-primary mb-2">Cambios sin guardar</h3>
-            <p className="text-[13px] text-text-secondary mb-5">
-              Si sales ahora perderás las puntuaciones ingresadas.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => blocker.reset?.()}
-                className="flex-1 py-2.5 border border-border-default rounded-lg text-[13px] text-text-secondary hover:border-text-hint transition-colors"
-              >
-                Seguir evaluando
-              </button>
-              <button
-                onClick={() => blocker.proceed?.()}
-                className="flex-1 py-2.5 bg-danger text-white rounded-lg text-[13px] font-bold hover:opacity-90 transition-opacity"
-              >
-                Salir sin guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Breadcrumb */}
       <Breadcrumb
         navigate={navigate}

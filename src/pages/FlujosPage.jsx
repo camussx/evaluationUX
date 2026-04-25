@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useFlows } from '../hooks/useFlows'
 import { useAuth } from '../hooks/useAuth'
 import { getScoreColor } from '../utils/scoring'
@@ -143,10 +143,20 @@ function NewFlowModal({ onClose, onCreate }) {
 
 export default function FlujosPage() {
   const navigate                           = useNavigate()
+  const location                           = useLocation()
   const { flows, loading, error, createFlow } = useFlows()
   const { role }                           = useAuth()
   const [showModal, setModal]              = useState(false)
   const isAdmin                            = role === 'admin'
+
+  // Auto-open modal when navigated from Dashboard "+ Nuevo flujo"
+  useEffect(() => {
+    if (location.state?.openModal && isAdmin) {
+      setModal(true)
+      // Clear the state so back-navigation doesn't re-open
+      window.history.replaceState({}, '')
+    }
+  }, [location.state?.openModal, isAdmin])
 
   // Group by product
   const groups = useMemo(() => {

@@ -25,7 +25,7 @@ export default function AppHeader() {
     { to: '/',          label: 'Dashboard', end: true          },
     { to: '/flujos',    label: 'Flujos'                        },
     { to: '/criterios', label: 'Criterios'                     },
-    ...(role === 'admin' ? [{ to: '/admin', label: 'Admin' }] : []),
+    ...(role === 'admin' ? [{ to: '/admin', label: 'Equipo' }] : []),
   ]
 
   const roleColor = ROLE_COLORS[role] ?? '#6B7280'

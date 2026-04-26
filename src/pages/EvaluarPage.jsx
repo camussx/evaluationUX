@@ -13,9 +13,9 @@ import { saveEvaluation } from '../hooks/useEvaluations'
 // Guarda habilitado solo cuando los 10 tienen score asignado.
 
 const SCALE_COLORS = {
-  s1:  '#F87171',
-  s5:  '#FBBF24',
-  s10: '#34D399',
+  s1:  '#DC2626',
+  s5:  '#B45309',
+  s10: '#059669',
 }
 
 const SCALE_LABELS = {
@@ -116,7 +116,7 @@ function EvaluarForm({ flowId, navigate, user }) {
   const allScored = answered === CRITERIA.length
   const adjScore  = calcWeightedScore(scores, CRITERIA)
   const sc        = adjScore ? getScoreColor(parseFloat(adjScore)) : '#6B7280'
-  const sb        = adjScore ? getScoreBg(parseFloat(adjScore))    : 'rgba(34,38,58,0.5)'
+  const sb        = adjScore ? getScoreBg(parseFloat(adjScore))    : 'rgba(107,114,128,0.08)'
 
   // ── Navigation guard (beforeunload only — useBlocker requires data router) ──
   useEffect(() => {
@@ -274,7 +274,7 @@ function EvaluarForm({ flowId, navigate, user }) {
       {/* Mobile notice */}
       <div
         className="md:hidden mb-5 flex items-start gap-2.5 px-4 py-3 rounded-lg border text-[13px] leading-snug"
-        style={{ background: 'rgba(147,180,250,0.06)', borderColor: '#93B4FA', color: '#93B4FA' }}
+        style={{ background: '#EEEEF9', borderColor: '#BBBDE8', color: '#5B5FC7' }}
       >
         <span className="flex-shrink-0">💡</span>
         <span>Para una mejor experiencia de evaluación, te recomendamos un dispositivo de escritorio.</span>
@@ -367,7 +367,7 @@ function EvaluarForm({ flowId, navigate, user }) {
                       style={
                         active
                           ? { background: c.color, borderColor: c.color, color: '#fff' }
-                          : { background: '#22263A', borderColor: '#2E3347', color: '#9CA3B8' }
+                          : { background: '#F8F9FC', borderColor: '#E5E7EB', color: '#6B7280' }
                       }
                     >
                       {n}

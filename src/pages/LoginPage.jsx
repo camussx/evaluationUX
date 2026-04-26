@@ -157,7 +157,7 @@ function LoginShell({ children }) {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: '#0F1117' }}
+      style={{ background: '#F0F2F7' }}
     >
       {/* Subtle decorative blobs */}
       <div
@@ -169,7 +169,7 @@ function LoginShell({ children }) {
           style={{
             width: 500, height: 500,
             top: '-120px', right: '-120px',
-            background: 'radial-gradient(circle, rgba(147,180,250,0.06) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(91,95,199,0.06) 0%, transparent 70%)',
           }}
         />
         <div

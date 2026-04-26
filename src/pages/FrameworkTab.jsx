@@ -34,7 +34,7 @@ function JustCard({ color, pct, title, sub, desc }) {
         <div className="text-[28px] font-bold font-mono mb-0.5" style={{ color }}>{pct}</div>
         <div className="text-[13px] font-bold text-text-primary">{title}</div>
         {sub && <div className="text-[11px] text-text-secondary italic mt-0.5 mb-2.5">{sub}</div>}
-        <div className="h-px my-2.5" style={{ background: '#2E3347' }} />
+        <div className="h-px my-2.5" style={{ background: '#E5E7EB' }} />
         <div className="text-[12px] text-text-secondary leading-relaxed">{desc}</div>
       </div>
     </div>

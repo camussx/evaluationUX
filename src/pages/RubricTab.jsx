@@ -3,14 +3,14 @@ import { CRITERIA } from '../data/criteria'
 import WeightBar from '../components/WeightBar'
 
 const BADGE = {
-  Base:  { bg: 'rgba(251,191,36,0.12)',  color: '#FBBF24', border: 'rgba(251,191,36,0.35)' },
-  Nuevo: { bg: 'rgba(52,211,153,0.12)', color: '#34D399',  border: 'rgba(52,211,153,0.35)' },
+  Base:  { bg: '#FEF9C3', color: '#B45309', border: 'rgba(180,83,9,0.3)'   },
+  Nuevo: { bg: '#D1FAE5', color: '#059669', border: 'rgba(5,150,105,0.3)'  },
 }
 
 const SCALE_LEVELS = [
-  { key: 's1',  score: 1,  label: 'Falla Crítica',    color: '#F87171', bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.3)' },
-  { key: 's5',  score: 5,  label: 'Funcional Básico', color: '#FBBF24', bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.3)'  },
-  { key: 's10', score: 10, label: 'Excelencia UX',    color: '#34D399', bg: 'rgba(52,211,153,0.08)',  border: 'rgba(52,211,153,0.3)'  },
+  { key: 's1',  score: 1,  label: 'Falla Crítica',    color: '#DC2626', bg: '#FEE2E2', border: 'rgba(220,38,38,0.3)'   },
+  { key: 's5',  score: 5,  label: 'Funcional Básico', color: '#B45309', bg: '#FEF3C7', border: 'rgba(180,83,9,0.3)'    },
+  { key: 's10', score: 10, label: 'Excelencia UX',    color: '#059669', bg: '#D1FAE5', border: 'rgba(5,150,105,0.3)'   },
 ]
 
 export default function RubricTab() {

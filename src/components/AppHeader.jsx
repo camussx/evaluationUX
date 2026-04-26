@@ -7,8 +7,8 @@ import { useAuth } from '../hooks/useAuth'
 // Replaces the old Header + TabNav pair.
 
 const ROLE_COLORS = {
-  admin:     '#93B4FA',
-  evaluador: '#34D399',
+  admin:     '#5B5FC7',
+  evaluador: '#059669',
   viewer:    '#6B7280',
 }
 
@@ -33,7 +33,7 @@ export default function AppHeader() {
   return (
     <header
       className="sticky top-0 z-50 border-b"
-      style={{ background: '#1A1D27', borderBottomColor: '#2E3347' }}
+      style={{ background: '#FFFFFF', borderBottomColor: '#E5E7EB' }}
     >
       <div className="max-w-[960px] mx-auto px-4 flex items-center h-12 gap-4">
 
@@ -52,8 +52,8 @@ export default function AppHeader() {
               className={({ isActive }) => [
                 'px-3 py-1.5 rounded-md text-[13px] font-medium whitespace-nowrap no-underline transition-colors duration-150',
                 isActive
-                  ? 'bg-background-elevated text-text-primary'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-background-elevated/50',
+                  ? 'bg-accent text-white'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-background-elevated',
               ].join(' ')}
             >
               {t.label}

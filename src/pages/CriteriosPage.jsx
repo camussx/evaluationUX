@@ -23,7 +23,7 @@ export default function CriteriosPage() {
 
         <div
           className="flex gap-1 rounded-lg p-1"
-          style={{ background: '#22263A', border: '1px solid #2E3347' }}
+          style={{ background: '#F0F2F7', border: '1px solid #E5E7EB' }}
         >
           {[
             { key: 'rubric',    label: 'Rúbrica'    },

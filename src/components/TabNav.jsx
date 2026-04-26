@@ -8,8 +8,8 @@ const TABS = [
 ]
 
 const ROLE_META = {
-  admin:     { label: 'Admin',     color: '#93B4FA' },
-  evaluador: { label: 'Evaluador', color: '#34D399' },
+  admin:     { label: 'Admin',     color: '#5B5FC7' },
+  evaluador: { label: 'Evaluador', color: '#059669' },
   viewer:    { label: 'Viewer',    color: '#6B7280' },
 }
 
@@ -24,7 +24,7 @@ export default function TabNav() {
   return (
     <nav
       className="sticky top-0 z-50 border-b"
-      style={{ background: '#1A1D27', borderBottomColor: '#2E3347' }}
+      style={{ background: '#FFFFFF', borderBottomColor: '#E5E7EB' }}
     >
       <div className="max-w-[920px] mx-auto flex items-stretch overflow-x-auto">
 

@@ -46,8 +46,8 @@ export default function EvaluadorTab() {
   const answered  = CRITERIA.filter(c => scores[c.id] != null).length
   const allScored = CRITERIA.every(c => scores[c.id] != null)
   const adjScore  = calcWeightedScore(scores, CRITERIA)
-  const sc        = adjScore ? getScoreColor(parseFloat(adjScore)) : '#9CA3B8'
-  const sb        = adjScore ? getScoreBg(parseFloat(adjScore))    : 'rgba(34,38,58,0.5)'
+  const sc        = adjScore ? getScoreColor(parseFloat(adjScore)) : '#6B7280'
+  const sb        = adjScore ? getScoreBg(parseFloat(adjScore))    : 'rgba(107,114,128,0.08)'
 
   // ── Navigation guard ──────────────────────────────────────────────────────
   const isDirty = answered > 0 && saveStatus !== 'saved'
@@ -196,7 +196,7 @@ export default function EvaluadorTab() {
       {/* ── Mobile banner ───────────────────────────────────────────────── */}
       <div
         className="md:hidden mb-4 flex items-start gap-2.5 px-4 py-3 rounded-lg border text-[13px] leading-snug"
-        style={{ background: 'rgba(147,180,250,0.08)', borderColor: '#93B4FA', color: '#93B4FA' }}
+        style={{ background: '#EEEEF9', borderColor: '#BBBDE8', color: '#5B5FC7' }}
       >
         <span className="mt-px flex-shrink-0">💡</span>
         <span>Para una mejor experiencia de evaluación, te recomendamos usar un dispositivo de escritorio.</span>
@@ -257,7 +257,7 @@ export default function EvaluadorTab() {
                     style={
                       active
                         ? { background: c.color, borderColor: c.color, color: '#fff' }
-                        : { background: '#22263A', borderColor: '#2E3347', color: '#9CA3B8' }
+                        : { background: '#F8F9FC', borderColor: '#E5E7EB', color: '#6B7280' }
                     }
                     onClick={() => setScore(c.id, n)}
                     aria-label={`Puntaje ${n} para ${c.name}`}

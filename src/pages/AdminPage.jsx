@@ -9,9 +9,9 @@ import { supabase } from '../lib/supabase'
 //   Usuarios    — lista de usuarios + invitar nuevo evaluador
 
 const ROLE_STYLE = {
-  admin:     { color: '#93B4FA', bg: 'rgba(147,180,250,0.1)',  border: 'rgba(147,180,250,0.3)'  },
-  evaluador: { color: '#34D399', bg: 'rgba(52,211,153,0.1)',   border: 'rgba(52,211,153,0.3)'   },
-  viewer:    { color: '#6B7280', bg: 'rgba(107,114,128,0.1)',  border: 'rgba(107,114,128,0.3)'  },
+  admin:     { color: '#5B5FC7', bg: '#EEEEF9',  border: '#BBBDE8'  },
+  evaluador: { color: '#065F46', bg: '#D1FAE5',  border: '#A7F3D0'  },
+  viewer:    { color: '#6B7280', bg: '#F3F4F6',  border: '#D1D5DB'  },
 }
 
 function RoleBadge({ role }) {
@@ -55,7 +55,7 @@ function EvaluadoresTab({ profiles, flows, permissions, toggling, onToggle }) {
       {/* Info notice */}
       <div
         className="flex items-start gap-3 px-4 py-3 rounded-lg border mb-5 text-[13px]"
-        style={{ background: 'rgba(147,180,250,0.06)', borderColor: 'rgba(147,180,250,0.2)', color: '#93B4FA' }}
+        style={{ background: '#EEEEF9', borderColor: '#BBBDE8', color: '#5B5FC7' }}
       >
         <span className="flex-shrink-0">ℹ️</span>
         <span>
@@ -174,7 +174,7 @@ function UsuariosTab({ profiles, onRefresh }) {
         {inviteStatus === 'sent' ? (
           <div
             className="flex items-center gap-2 px-4 py-3 rounded-lg border text-[13px]"
-            style={{ background: 'rgba(52,211,153,0.08)', borderColor: 'rgba(52,211,153,0.3)', color: '#34D399' }}
+            style={{ background: '#D1FAE5', borderColor: '#A7F3D0', color: '#065F46' }}
           >
             <span>✓</span>
             <span>
@@ -340,7 +340,7 @@ export default function AdminPage() {
       {/* Internal tab switcher */}
       <div
         className="flex gap-1 rounded-lg p-1 mb-6 w-fit"
-        style={{ background: '#22263A', border: '1px solid #2E3347' }}
+        style={{ background: '#F0F2F7', border: '1px solid #E5E7EB' }}
       >
         {[
           { key: 'evaluadores', label: 'Evaluadores' },

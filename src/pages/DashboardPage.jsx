@@ -141,9 +141,9 @@ export default function DashboardPage() {
                               <span
                                 className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full border"
                                 style={{
-                                  color:       '#34D399',
-                                  background:  'rgba(52,211,153,0.1)',
-                                  borderColor: 'rgba(52,211,153,0.3)',
+                                  color:       '#065F46',
+                                  background:  '#D1FAE5',
+                                  borderColor: '#A7F3D0',
                                 }}
                               >
                                 Evaluado

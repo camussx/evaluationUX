@@ -11,8 +11,8 @@
   }
   body {
     font-family: 'DM Sans', sans-serif;
-    background-color: #0F1117;
-    color: #F0F2F7;
+    background-color: #F0F2F7;
+    color: #1A1D35;
     font-size: 14px;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -37,7 +37,7 @@
 
   /* Score button hover state (plain HTML button resets) */
   .score-btn:hover:not(.score-btn--active) {
-    border-color: #4F8EF7 !important;
-    color: #93B4FA !important;
+    border-color: #BBBDE8 !important;
+    color: #5B5FC7 !important;
   }
 }

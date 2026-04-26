@@ -33,7 +33,7 @@ function LoadingScreen() {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center"
-      style={{ background: '#0F1117' }}
+      style={{ background: '#F0F2F7' }}
     >
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin" />
@@ -55,14 +55,14 @@ const ROLES = [
     icon: '🛡️',
     label: 'Administrador',
     desc: 'Crea flujos, gestiona evaluadores y accede a todo el historial del equipo.',
-    color: '#93B4FA',
+    color: '#5B5FC7',
   },
   {
     id: 'evaluador',
     icon: '🎯',
     label: 'Evaluador',
     desc: 'Evalúa los flujos asignados y consulta el historial de evaluaciones.',
-    color: '#34D399',
+    color: '#059669',
   },
   {
     id: 'viewer',
@@ -93,7 +93,7 @@ function RoleSelector({ onConfirm }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-6"
-      style={{ background: '#0F1117' }}
+      style={{ background: '#F0F2F7' }}
     >
       <div className="w-full max-w-lg">
         {/* Header */}
@@ -133,7 +133,7 @@ function RoleSelector({ onConfirm }) {
                 <div className="text-2xl mb-2">{r.icon}</div>
                 <div
                   className="text-[13px] font-bold mb-1"
-                  style={{ color: isSelected ? r.color : '#F0F2F7' }}
+                  style={{ color: isSelected ? r.color : '#1A1D35' }}
                 >
                   {r.label}
                 </div>

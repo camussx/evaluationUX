@@ -25,7 +25,7 @@ function ChartTooltip({ active, payload, label }) {
   return (
     <div
       className="rounded-lg px-3 py-2 border shadow-xl text-left"
-      style={{ background: '#1A1D27', borderColor: '#2E3347' }}
+      style={{ background: '#FFFFFF', borderColor: '#E5E7EB' }}
     >
       <p className="text-[11px] text-text-secondary mb-1">{label}</p>
       <p className="text-[20px] font-bold font-mono" style={{ color }}>
@@ -69,28 +69,28 @@ function ScoreChart({ evaluations }) {
       <AreaChart data={data} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
         <defs>
           <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor="#93B4FA" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="#93B4FA" stopOpacity={0}    />
+            <stop offset="5%"  stopColor="#5B5FC7" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#5B5FC7" stopOpacity={0}    />
           </linearGradient>
         </defs>
 
-        <CartesianGrid strokeDasharray="3 3" stroke="#2E3347" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
 
         <XAxis
           dataKey="date"
-          stroke="#2E3347"
+          stroke="#E5E7EB"
           tick={{ fill: '#6B7280', fontSize: 11 }}
           tickLine={false}
         />
         <YAxis
           domain={[0, 10]}
           ticks={[0, 2.5, 5, 7.5, 10]}
-          stroke="#2E3347"
+          stroke="#E5E7EB"
           tick={{ fill: '#6B7280', fontSize: 11 }}
           tickLine={false}
         />
 
-        <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#2E3347' }} />
+        <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#E5E7EB' }} />
 
         {/* Threshold lines */}
         <ReferenceLine
@@ -109,11 +109,11 @@ function ScoreChart({ evaluations }) {
         <Area
           type="monotone"
           dataKey="score"
-          stroke="#93B4FA"
+          stroke="#5B5FC7"
           strokeWidth={2.5}
           fill="url(#scoreGrad)"
-          dot={{ r: 4, fill: '#93B4FA', strokeWidth: 0 }}
-          activeDot={{ r: 6, fill: '#93B4FA', stroke: '#0F1117', strokeWidth: 2 }}
+          dot={{ r: 4, fill: '#5B5FC7', strokeWidth: 0 }}
+          activeDot={{ r: 6, fill: '#5B5FC7', stroke: '#F0F2F7', strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>
@@ -389,7 +389,7 @@ export default function FlowDetailPage() {
         style={{
           background: 'rgba(147,180,250,0.06)',
           borderColor: 'rgba(147,180,250,0.2)',
-          color: '#93B4FA',
+          color: '#5B5FC7',
         }}
       >
         <span className="flex-shrink-0 mt-px">🔒</span>

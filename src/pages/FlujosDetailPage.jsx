@@ -329,7 +329,7 @@ export default function FlujosDetailPage() {
           {/* Append-only lock indicator */}
           <span
             className="text-[11px] font-semibold px-2.5 py-1 rounded-lg flex-shrink-0"
-            style={{ background: 'rgba(147,180,250,0.08)', color: '#93B4FA' }}
+            style={{ background: '#EEEEF9', color: '#5B5FC7' }}
           >
             🔒 Solo lectura
           </span>

@@ -3,8 +3,8 @@ export default function Header() {
     <header
       className="relative overflow-hidden border-b px-4 md:px-8 pt-8 pb-6"
       style={{
-        background: 'linear-gradient(135deg, #0F1117 0%, #1A1D27 55%, #0F1117 100%)',
-        borderBottomColor: '#2E3347',
+        background: 'linear-gradient(135deg, #F0F2F7 0%, #FFFFFF 55%, #F0F2F7 100%)',
+        borderBottomColor: '#E5E7EB',
       }}
     >
       {/* Decorative blob */}

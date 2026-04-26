@@ -6,25 +6,30 @@ export default {
     extend: {
       colors: {
         background: {
-          base:     '#0F1117',
-          surface:  '#1A1D27',
-          elevated: '#22263A',
+          base:     '#F0F2F7',
+          surface:  '#FFFFFF',
+          elevated: '#F8F9FC',
         },
         border: {
-          default: '#2E3347',
+          default: '#E5E7EB',
+          strong:  '#D1D5DB',
         },
         text: {
-          primary:   '#F0F2F7',
-          secondary: '#9CA3B8',
+          primary:   '#1A1D35',
+          secondary: '#6B7280',
           hint:      '#6B7280',
         },
         accent: {
-          DEFAULT: '#93B4FA',
-          icon:    '#4F8EF7',
+          DEFAULT: '#5B5FC7',
+          hover:   '#4B4FB7',
+          light:   '#EEEEF9',
+          text:    '#5B5FC7',
         },
-        success: '#34D399',
-        warning: '#FBBF24',
-        danger:  '#F87171',
+        success: '#065F46',
+        warning: '#B45309',
+        danger:  '#DC2626',
+        good:    '#059669',
+        info:    '#3B82F6',
       },
       fontFamily: {
         sans:  ['"DM Sans"', 'sans-serif'],

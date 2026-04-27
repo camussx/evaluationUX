@@ -4,14 +4,13 @@ import { useAuth } from '../hooks/useAuth'
 
 // ── AdminPage (ruta /admin, UI label "Equipo") ────────────────────────────────
 //
-// Vista única: tabla de personas con acceso a la plataforma.
-// Acciones por fila: Editar (rol + flujos) · Revocar acceso.
-// Cabecera: botón "+ Invitar persona" → InviteModal.
+// Tabla unificada de personas con acceso a la plataforma.
+// Todos los invitados entran como Evaluador — no hay selector de rol.
+// Acciones: Editar flujos asignados · Revocar acceso.
 //
-// Requiere tres RPCs en Supabase (supabase/team_management.sql):
+// Requiere RPCs en Supabase (supabase/team_management.sql):
 //   admin_get_users()
 //   admin_set_user_role_by_email(p_email, p_role) → uuid
-//   admin_update_user_role(p_user_id, p_role)
 //   admin_ban_user(p_user_id)
 
 // ── Shared style constants ────────────────────────────────────────────────────
@@ -44,96 +43,39 @@ const isBanned = (u) =>
 // ── Role badge ────────────────────────────────────────────────────────────────
 
 const ROLE_STYLE = {
-  admin:    { color: '#5B5FC7', bg: '#EEEEF9', border: '#BBBDE8', label: 'Admin'     },
-  evaluador:{ color: '#065F46', bg: '#D1FAE5', border: '#A7F3D0', label: 'Evaluador' },
-  viewer:   { color: '#6B7280', bg: '#F3F4F6', border: '#D1D5DB', label: 'Viewer'    },
+  admin:     { color: '#5B5FC7', bg: '#EEEEF9', border: '#BBBDE8', label: 'Admin'     },
+  evaluador: { color: '#065F46', bg: '#D1FAE5', border: '#A7F3D0', label: 'Evaluador' },
 }
 
 function RoleBadge({ role, banned }) {
   if (banned) {
     return (
-      <span className="text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
-        style={{ color: '#DC2626', background: '#FEE2E2', borderColor: '#FECACA' }}>
+      <span
+        className="text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
+        style={{ color: '#DC2626', background: '#FEE2E2', borderColor: '#FECACA' }}
+      >
         Acceso revocado
       </span>
     )
   }
-  const s = ROLE_STYLE[role] ?? ROLE_STYLE.viewer
+  const s = ROLE_STYLE[role] ?? ROLE_STYLE.evaluador
   return (
-    <span className="text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
-      style={{ color: s.color, background: s.bg, borderColor: s.border }}>
+    <span
+      className="text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
+      style={{ color: s.color, background: s.bg, borderColor: s.border }}
+    >
       {s.label}
     </span>
   )
 }
 
-// ── Role selector (shared by both modals) ─────────────────────────────────────
-
-const ROLE_OPTIONS = [
-  {
-    id: 'admin',
-    label: 'Admin',
-    desc: 'Acceso total. Puede crear flujos, invitar personas y ver todo.',
-  },
-  {
-    id: 'evaluador',
-    label: 'Evaluador',
-    desc: 'Puede evaluar los flujos que se le asignen y ver resultados.',
-  },
-  {
-    id: 'viewer',
-    label: 'Viewer',
-    desc: 'Solo puede ver resultados. No puede evaluar.',
-  },
-]
-
-function RoleSelector({ value, onChange }) {
-  return (
-    <div className="space-y-2">
-      {ROLE_OPTIONS.map(r => {
-        const s = ROLE_STYLE[r.id]
-        const active = value === r.id
-        return (
-          <label
-            key={r.id}
-            className={[
-              'flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-100',
-              active ? 'border-2' : 'border border-border-default hover:border-border-strong',
-            ].join(' ')}
-            style={active ? { borderColor: s.color, background: `${s.color}08` } : {}}
-          >
-            <input
-              type="radio"
-              name="modal-role"
-              value={r.id}
-              checked={active}
-              onChange={() => onChange(r.id)}
-              className="mt-0.5 flex-shrink-0"
-              style={{ accentColor: '#5B5FC7' }}
-            />
-            <div>
-              <span
-                className="text-[13px] font-semibold"
-                style={{ color: active ? s.color : '#1A1D35' }}
-              >
-                {r.label}
-              </span>
-              <p className="text-[11px] text-text-secondary mt-0.5 leading-snug">{r.desc}</p>
-            </div>
-          </label>
-        )
-      })}
-    </div>
-  )
-}
-
-// ── Flow checkboxes (shown when role = evaluador) ─────────────────────────────
+// ── Flow checkboxes ───────────────────────────────────────────────────────────
 
 function FlowCheckboxes({ flows, selected, onChange }) {
   if (flows.length === 0) {
     return (
       <p className="text-[12px] text-text-hint px-1 py-2">
-        Primero crea al menos un flujo para poder asignarlo.
+        Primero crea al menos un flujo antes de invitar a un evaluador.
       </p>
     )
   }
@@ -184,7 +126,6 @@ function ModalShell({ title, onClose, children }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md bg-background-surface border border-border-default rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-border-default flex-shrink-0">
           <h2 className="text-[16px] font-bold text-text-primary">{title}</h2>
           <button
@@ -195,7 +136,6 @@ function ModalShell({ title, onClose, children }) {
             ✕
           </button>
         </div>
-        {/* Body */}
         <div className="px-6 py-5 overflow-y-auto">{children}</div>
       </div>
     </div>
@@ -203,18 +143,22 @@ function ModalShell({ title, onClose, children }) {
 }
 
 // ── InviteModal ───────────────────────────────────────────────────────────────
+// All invitees enter as Evaluador — no role selector.
+// At least one flow must be selected before sending.
 
 function InviteModal({ flows, onClose, onSuccess }) {
   const [email,   setEmail]   = useState('')
-  const [role,    setRole]    = useState('evaluador')
   const [flowIds, setFlowIds] = useState([])
   const [saving,  setSaving]  = useState(false)
   const [error,   setError]   = useState('')
 
+  const noFlows   = flows.length === 0
+  const canSubmit = !saving && email.trim() && flowIds.length > 0 && !noFlows
+
   async function handleSubmit(e) {
     e.preventDefault()
     const normalEmail = email.trim().toLowerCase()
-    if (!normalEmail) return
+    if (!normalEmail || flowIds.length === 0) return
 
     setSaving(true)
     setError('')
@@ -230,29 +174,26 @@ function InviteModal({ flows, onClose, onSuccess }) {
       })
       if (otpErr) throw otpErr
 
-      // 2. Set role in auth.users via SECURITY DEFINER RPC
-      //    Returns the user's UUID
+      // 2. Set role as evaluador via SECURITY DEFINER RPC → returns user UUID
       const { data: userId, error: roleErr } = await supabase
         .rpc('admin_set_user_role_by_email', {
           p_email: normalEmail,
-          p_role:  role,
+          p_role:  'evaluador',
         })
       if (roleErr) throw roleErr
 
-      // 3. Insert flow permissions if evaluador
-      if (role === 'evaluador' && flowIds.length > 0) {
-        const { error: permErr } = await supabase
-          .from('flow_evaluator_permissions')
-          .upsert(
-            flowIds.map(fid => ({ flow_id: fid, user_id: userId })),
-            { onConflict: 'flow_id,user_id', ignoreDuplicates: true }
-          )
-        if (permErr) throw permErr
-      }
+      // 3. Insert flow permissions
+      const { error: permErr } = await supabase
+        .from('flow_evaluator_permissions')
+        .upsert(
+          flowIds.map(fid => ({ flow_id: fid, user_id: userId })),
+          { onConflict: 'flow_id,user_id', ignoreDuplicates: true }
+        )
+      if (permErr) throw permErr
 
       onSuccess(
         `Invitación enviada a ${normalEmail}. ` +
-        `La persona recibirá un magic link para acceder.`
+        `Cuando ingrese, verá los flujos que le asignaste.`
       )
     } catch (err) {
       setError(err.message || 'Error al enviar la invitación.')
@@ -261,8 +202,9 @@ function InviteModal({ flows, onClose, onSuccess }) {
   }
 
   return (
-    <ModalShell title="Invitar persona" onClose={onClose}>
+    <ModalShell title="Invitar evaluador" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-5">
+
         {/* Email */}
         <div>
           <label className={labelCls}>
@@ -279,24 +221,21 @@ function InviteModal({ flows, onClose, onSuccess }) {
           />
         </div>
 
-        {/* Role */}
+        {/* Flujos asignados */}
         <div>
           <label className={labelCls}>
-            Rol <span className="text-danger">*</span>
+            Flujos asignados <span className="text-danger">*</span>
           </label>
-          <RoleSelector value={role} onChange={r => { setRole(r); setFlowIds([]) }} />
-        </div>
-
-        {/* Flows (only for evaluador) */}
-        {role === 'evaluador' && (
-          <div>
-            <label className={labelCls}>Flujos asignados</label>
-            <p className="text-[11px] text-text-hint mb-2">
-              Selecciona los flujos que esta persona podrá evaluar.
+          <p className="text-[11px] text-text-hint mb-2">
+            Selecciona al menos un flujo que esta persona podrá evaluar.
+          </p>
+          <FlowCheckboxes flows={flows} selected={flowIds} onChange={setFlowIds} />
+          {!noFlows && flowIds.length === 0 && (
+            <p className="text-[11px] text-warning mt-1">
+              Debes seleccionar al menos un flujo.
             </p>
-            <FlowCheckboxes flows={flows} selected={flowIds} onChange={setFlowIds} />
-          </div>
-        )}
+          )}
+        </div>
 
         {error && (
           <p className="text-[12px] text-danger bg-danger/10 border border-danger/30 rounded-lg px-3 py-2">
@@ -310,7 +249,7 @@ function InviteModal({ flows, onClose, onSuccess }) {
           </button>
           <button
             type="submit"
-            disabled={saving || !email.trim()}
+            disabled={!canSubmit}
             className={primaryBtnCls}
           >
             {saving ? 'Enviando…' : 'Enviar invitación'}
@@ -322,9 +261,9 @@ function InviteModal({ flows, onClose, onSuccess }) {
 }
 
 // ── EditModal ─────────────────────────────────────────────────────────────────
+// Only edits the evaluador's assigned flows — role is fixed as evaluador.
 
 function EditModal({ user, flows, initialFlowIds, onClose, onSuccess }) {
-  const [role,    setRole]    = useState(user.role ?? 'viewer')
   const [flowIds, setFlowIds] = useState(initialFlowIds)
   const [saving,  setSaving]  = useState(false)
   const [error,   setError]   = useState('')
@@ -335,30 +274,21 @@ function EditModal({ user, flows, initialFlowIds, onClose, onSuccess }) {
     setError('')
 
     try {
-      // 1. Update role in auth.users + profiles
-      const { error: roleErr } = await supabase.rpc('admin_update_user_role', {
-        p_user_id: user.id,
-        p_role:    role,
-      })
-      if (roleErr) throw roleErr
-
-      // 2. Sync flow permissions
-      // Always wipe existing permissions first
+      // Wipe existing permissions then re-insert selected ones
       const { error: delErr } = await supabase
         .from('flow_evaluator_permissions')
         .delete()
         .eq('user_id', user.id)
       if (delErr) throw delErr
 
-      // Insert new ones only if evaluador with selections
-      if (role === 'evaluador' && flowIds.length > 0) {
+      if (flowIds.length > 0) {
         const { error: insErr } = await supabase
           .from('flow_evaluator_permissions')
           .insert(flowIds.map(fid => ({ flow_id: fid, user_id: user.id })))
         if (insErr) throw insErr
       }
 
-      onSuccess('Cambios guardados.')
+      onSuccess('Flujos asignados actualizados.')
     } catch (err) {
       setError(err.message || 'Error al guardar los cambios.')
       setSaving(false)
@@ -366,32 +296,22 @@ function EditModal({ user, flows, initialFlowIds, onClose, onSuccess }) {
   }
 
   return (
-    <ModalShell title="Editar persona" onClose={onClose}>
+    <ModalShell title="Editar flujos asignados" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-5">
+
         {/* Email (read-only) */}
         <div>
-          <label className={labelCls}>Email</label>
+          <label className={labelCls}>Evaluador</label>
           <div className="px-3.5 py-2.5 bg-background-elevated border border-border-default rounded-lg text-[13px] text-text-secondary">
             {user.email}
           </div>
-          <p className="text-[11px] text-text-hint mt-1">
-            El email no puede modificarse desde aquí.
-          </p>
         </div>
 
-        {/* Role */}
+        {/* Flujos */}
         <div>
-          <label className={labelCls}>Rol</label>
-          <RoleSelector value={role} onChange={r => { setRole(r); if (r !== 'evaluador') setFlowIds([]) }} />
+          <label className={labelCls}>Flujos asignados</label>
+          <FlowCheckboxes flows={flows} selected={flowIds} onChange={setFlowIds} />
         </div>
-
-        {/* Flows */}
-        {role === 'evaluador' && (
-          <div>
-            <label className={labelCls}>Flujos asignados</label>
-            <FlowCheckboxes flows={flows} selected={flowIds} onChange={setFlowIds} />
-          </div>
-        )}
 
         {error && (
           <p className="text-[12px] text-danger bg-danger/10 border border-danger/30 rounded-lg px-3 py-2">
@@ -450,11 +370,7 @@ function RevokeDialog({ user, onClose, onConfirm }) {
           </p>
         )}
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            disabled={revoking}
-            className={cancelBtnCls}
-          >
+          <button onClick={onClose} disabled={revoking} className={cancelBtnCls}>
             Cancelar
           </button>
           <button
@@ -498,9 +414,9 @@ export default function AdminPage() {
   const [loading,     setLoading]     = useState(true)
 
   const [showInvite,   setShowInvite]   = useState(false)
-  const [editingUser,  setEditingUser]  = useState(null)  // user row object
-  const [revokingUser, setRevokingUser] = useState(null)  // user row object
-  const [toast,        setToast]        = useState(null)  // { type, msg }
+  const [editingUser,  setEditingUser]  = useState(null)
+  const [revokingUser, setRevokingUser] = useState(null)
+  const [toast,        setToast]        = useState(null)
 
   const showToast = useCallback((type, msg) => {
     setToast({ type, msg })
@@ -522,24 +438,21 @@ export default function AdminPage() {
 
   useEffect(() => { load() }, [load])
 
-  // ── Derived helpers ──────────────────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────────────────────────
 
   function getUserFlowIds(userId) {
     return permissions.filter(p => p.user_id === userId).map(p => p.flow_id)
   }
 
-  function getFlowsDisplay(user) {
-    if (isBanned(user))             return null
-    if (user.role === 'admin')      return 'Todos los flujos'
-    if (user.role === 'evaluador') {
-      const ids   = getUserFlowIds(user.id)
-      const names = flows.filter(f => ids.includes(f.id)).map(f => f.name)
-      return names.length > 0 ? names.join(', ') : null
-    }
-    return null  // viewer → "Sin flujos asignados"
+  function getFlowsDisplay(u) {
+    if (isBanned(u)) return null
+    if (u.role === 'admin') return 'Todos los flujos'
+    const ids   = getUserFlowIds(u.id)
+    const names = flows.filter(f => ids.includes(f.id)).map(f => f.name)
+    return names.length > 0 ? names.join(', ') : null
   }
 
-  // ── Loading ──────────────────────────────────────────────────────────────────
+  // ── Loading state ────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -553,14 +466,13 @@ export default function AdminPage() {
     )
   }
 
-  // Other users (everyone except the current admin)
-  const otherUsers = users.filter(u => u.id !== currentUser?.id)
+  // Evaluadores: everyone except the current admin
+  const evaluadores = users.filter(u => u.id !== currentUser?.id)
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
     <div>
-      {/* Toast */}
       {toast && <Toast msg={toast.msg} type={toast.type} />}
 
       {/* Page header */}
@@ -568,19 +480,19 @@ export default function AdminPage() {
         <div>
           <h1 className="text-[22px] font-bold text-text-primary">Equipo</h1>
           <p className="text-[13px] text-text-secondary mt-0.5">
-            Gestiona las personas con acceso a la plataforma y los flujos que pueden evaluar.
+            Gestiona los evaluadores y los flujos que pueden evaluar.
           </p>
         </div>
         <button
           onClick={() => setShowInvite(true)}
           className="flex-shrink-0 px-4 py-2 bg-accent text-white text-[13px] font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
-          + Invitar persona
+          + Invitar evaluador
         </button>
       </div>
 
       {/* Empty state */}
-      {otherUsers.length === 0 ? (
+      {evaluadores.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-28 border border-dashed border-border-default rounded-xl text-center">
           <p className="text-[15px] text-text-secondary font-semibold mb-2">
             Aún no hay evaluadores registrados
@@ -592,7 +504,7 @@ export default function AdminPage() {
             onClick={() => setShowInvite(true)}
             className="px-5 py-2.5 bg-accent text-white text-[13px] font-bold rounded-lg hover:opacity-90 transition-opacity"
           >
-            + Invitar primera persona
+            + Invitar primer evaluador
           </button>
         </div>
       ) : (
@@ -613,12 +525,11 @@ export default function AdminPage() {
             </thead>
 
             <tbody>
-              {users.map(u => {
-                const banned        = isBanned(u)
-                const isMe          = u.id === currentUser?.id
-                const flowsDisplay  = getFlowsDisplay(u)
-                const userFlowIds   = getUserFlowIds(u.id)
-                const lastSeen      = fmtDate(u.last_sign_in_at)
+              {evaluadores.map(u => {
+                const banned       = isBanned(u)
+                const flowsDisplay = getFlowsDisplay(u)
+                const userFlowIds  = getUserFlowIds(u.id)
+                const lastSeen     = fmtDate(u.last_sign_in_at)
 
                 return (
                   <tr
@@ -627,16 +538,9 @@ export default function AdminPage() {
                   >
                     {/* Persona */}
                     <td className="py-3.5 px-4 pl-5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[13px] font-medium text-text-primary">
-                          {u.email}
-                        </span>
-                        {isMe && (
-                          <span className="text-[10px] font-semibold text-text-hint bg-background-elevated px-1.5 py-0.5 rounded border border-border-default">
-                            Tú
-                          </span>
-                        )}
-                      </div>
+                      <span className="text-[13px] font-medium text-text-primary">
+                        {u.email}
+                      </span>
                     </td>
 
                     {/* Rol */}
@@ -674,7 +578,7 @@ export default function AdminPage() {
                             Editar
                           </button>
                         )}
-                        {!isMe && !banned && (
+                        {!banned && (
                           <button
                             onClick={() => setRevokingUser(u)}
                             className="text-[12px] font-semibold px-3 py-1 rounded-lg border border-danger/30 text-danger hover:bg-danger/8 transition-colors"

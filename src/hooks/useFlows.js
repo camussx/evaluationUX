@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 /** Return the most recent evaluation from a flow's nested evaluations array. */
-function getLatestEval(evaluations = []) {
+export function getLatestEval(evaluations = []) {
   if (!evaluations.length) return null
   return [...evaluations].sort(
     (a, b) => new Date(b.evaluated_at) - new Date(a.evaluated_at)
@@ -12,7 +12,7 @@ function getLatestEval(evaluations = []) {
 }
 
 /** Attach lastScore, lastEvaluatedAt, evalCount and avgScore to each flow. */
-function enrichFlows(flows) {
+export function enrichFlows(flows) {
   return flows.map(f => {
     const evals  = f.evaluations ?? []
     const latest = getLatestEval(evals)

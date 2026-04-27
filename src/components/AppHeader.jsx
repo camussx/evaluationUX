@@ -9,24 +9,27 @@ import { useAuth } from '../hooks/useAuth'
 const ROLE_COLORS = {
   admin:     '#5B5FC7',
   evaluador: '#059669',
-  viewer:    '#6B7280',
 }
 
 const ROLE_LABELS = {
   admin:     'Admin',
   evaluador: 'Evaluador',
-  viewer:    'Viewer',
 }
 
 export default function AppHeader() {
   const { user, role, signOut } = useAuth()
 
-  const NAV_TABS = [
-    { to: '/',          label: 'Dashboard', end: true          },
-    { to: '/flujos',    label: 'Flujos'                        },
-    { to: '/criterios', label: 'Criterios'                     },
-    ...(role === 'admin' ? [{ to: '/admin', label: 'Equipo' }] : []),
-  ]
+  const NAV_TABS = role === 'admin'
+    ? [
+        { to: '/',          label: 'Dashboard', end: true },
+        { to: '/flujos',    label: 'Flujos'               },
+        { to: '/criterios', label: 'Criterios'            },
+        { to: '/admin',     label: 'Equipo'               },
+      ]
+    : [
+        { to: '/',          label: 'Dashboard', end: true },
+        { to: '/criterios', label: 'Criterios'            },
+      ]
 
   const roleColor = ROLE_COLORS[role] ?? '#6B7280'
 

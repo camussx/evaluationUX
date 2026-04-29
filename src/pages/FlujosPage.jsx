@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useFlows } from '../hooks/useFlows'
 import { useAuth } from '../hooks/useAuth'
 import { getScoreColor } from '../utils/scoring'
+import FlowActionsMenu from '../components/FlowActionsMenu'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -264,7 +265,7 @@ export default function FlujosPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border-default bg-background-elevated/40">
-                      {['Flujo', 'Descripción', 'Evaluaciones', 'Promedio', 'Creación'].map(h => (
+                      {['Flujo', 'Descripción', 'Evaluaciones', 'Promedio', 'Creación', 'Acciones'].map(h => (
                         <th
                           key={h}
                           className="text-left text-[11px] font-bold tracking-[1px] uppercase text-text-hint py-3 px-4 first:pl-5 last:pr-5"
@@ -320,8 +321,12 @@ export default function FlujosPage() {
                           </td>
 
                           {/* Creación */}
-                          <td className="py-3.5 px-4 pr-5 text-[13px] text-text-hint whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-[13px] text-text-hint whitespace-nowrap">
                             {fmtDate(flow.created_at)}
+                          </td>
+                          {/* Acciones */}
+                          <td className="py-3.5 px-4 pr-5" onClick={e => e.stopPropagation()}>
+                            <FlowActionsMenu flowId={flow.id} hasEvals={flow.evalCount > 0} />
                           </td>
                         </tr>
                       )

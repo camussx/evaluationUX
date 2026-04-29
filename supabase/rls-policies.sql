@@ -81,9 +81,11 @@ CREATE POLICY "flows_insert" ON public.flows
 CREATE POLICY "flows_update" ON public.flows
   FOR UPDATE USING (false);
 
--- DELETE: nobody from client
+-- DELETE: only admin (used by delete flow feature)
 CREATE POLICY "flows_delete" ON public.flows
-  FOR DELETE USING (false);
+  FOR DELETE USING (
+    public.get_my_role() = 'admin'
+  );
 
 -- ── evaluations ───────────────────────────────────────────────────────────────
 
@@ -128,9 +130,11 @@ CREATE POLICY "evaluations_insert" ON public.evaluations
 CREATE POLICY "evaluations_update" ON public.evaluations
   FOR UPDATE USING (false);
 
--- DELETE: nobody
+-- DELETE: only admin (cascade delete when deleting a flow)
 CREATE POLICY "evaluations_delete" ON public.evaluations
-  FOR DELETE USING (false);
+  FOR DELETE USING (
+    public.get_my_role() = 'admin'
+  );
 
 -- ── evaluation_criteria ───────────────────────────────────────────────────────
 -- Child table of evaluations — follows parent access rules.
@@ -161,8 +165,11 @@ CREATE POLICY "eval_criteria_insert" ON public.evaluation_criteria
 CREATE POLICY "eval_criteria_update" ON public.evaluation_criteria
   FOR UPDATE USING (false);
 
+-- DELETE: only admin (cascade delete when deleting a flow)
 CREATE POLICY "eval_criteria_delete" ON public.evaluation_criteria
-  FOR DELETE USING (false);
+  FOR DELETE USING (
+    public.get_my_role() = 'admin'
+  );
 
 -- ── evaluation_evaluators ─────────────────────────────────────────────────────
 -- Child table of evaluations — follows parent access rules.
@@ -193,8 +200,11 @@ CREATE POLICY "eval_evaluators_insert" ON public.evaluation_evaluators
 CREATE POLICY "eval_evaluators_update" ON public.evaluation_evaluators
   FOR UPDATE USING (false);
 
+-- DELETE: only admin (cascade delete when deleting a flow)
 CREATE POLICY "eval_evaluators_delete" ON public.evaluation_evaluators
-  FOR DELETE USING (false);
+  FOR DELETE USING (
+    public.get_my_role() = 'admin'
+  );
 
 -- ── flow_evaluator_permissions ────────────────────────────────────────────────
 

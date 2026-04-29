@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useFlows, enrichFlows } from '../hooks/useFlows'
 import { supabase } from '../lib/supabase'
 import { getScoreColor } from '../utils/scoring'
+import FlowActionsMenu from '../components/FlowActionsMenu'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -17,13 +18,17 @@ const fmtDate = (iso) =>
 const truncate = (str, n = 30) =>
   !str ? '—' : str.length > n ? str.slice(0, n) + '…' : str
 
-// ── AccessDeniedBanner ────────────────────────────────────────────────────────
+// ── NotificationBanner ───────────────────────────────────────────────────────
 
-function AccessDeniedBanner({ msg }) {
+function NotificationBanner({ msg, type }) {
+  if (!msg) return null
+  const styles = type === 'success'
+    ? { background: '#D1FAE5', borderColor: '#A7F3D0', color: '#065F46' }
+    : { background: '#FEE2E2', borderColor: '#FECACA', color: '#DC2626' }
   return (
     <div
       className="mb-6 px-4 py-3 rounded-xl border text-[13px] font-semibold"
-      style={{ background: '#FEE2E2', borderColor: '#FECACA', color: '#DC2626' }}
+      style={styles}
     >
       {msg}
     </div>
@@ -80,7 +85,7 @@ function FlowTable({ flows, onRowClick }) {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border-default bg-background-elevated/40">
-                  {['Flujo', 'Estatus', 'Evaluaciones', 'Promedio', 'Descripción', 'Creación'].map(h => (
+                  {['Flujo', 'Estatus', 'Evaluaciones', 'Promedio', 'Descripción', 'Creación', 'Acciones'].map(h => (
                     <th
                       key={h}
                       className="text-left text-[11px] font-bold tracking-[1px] uppercase text-text-hint py-3 px-4 first:pl-5 last:pr-5"
@@ -134,8 +139,11 @@ function FlowTable({ flows, onRowClick }) {
                       <td className="py-3.5 px-4 text-[13px] text-text-secondary">
                         {truncate(flow.description)}
                       </td>
-                      <td className="py-3.5 px-4 pr-5 text-[13px] text-text-hint whitespace-nowrap">
+                      <td className="py-3.5 px-4 text-[13px] text-text-hint whitespace-nowrap">
                         {fmtDate(flow.created_at)}
+                      </td>
+                      <td className="py-3.5 px-4 pr-5" onClick={e => e.stopPropagation()}>
+                        <FlowActionsMenu flowId={flow.id} hasEvals={flow.evalCount > 0} />
                       </td>
                     </tr>
                   )
@@ -151,14 +159,19 @@ function FlowTable({ flows, onRowClick }) {
 
 // ── AdminDashboard ────────────────────────────────────────────────────────────
 
-function AdminDashboard({ accessDeniedMsg }) {
+function AdminDashboard({ bannerMsg, bannerType }) {
   const navigate               = useNavigate()
   const { flows, loading, error } = useFlows()
+
+  // Clear location state after reading banner
+  useEffect(() => {
+    if (bannerMsg) window.history.replaceState({}, '')
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!loading && !error && flows.length === 0) {
     return (
       <div>
-        {accessDeniedMsg && <AccessDeniedBanner msg={accessDeniedMsg} />}
+        <NotificationBanner msg={bannerMsg} type={bannerType} />
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <p className="text-[16px] text-text-secondary mb-6">
             Aún no tienes flujos evaluados
@@ -176,7 +189,7 @@ function AdminDashboard({ accessDeniedMsg }) {
 
   return (
     <div>
-      {accessDeniedMsg && <AccessDeniedBanner msg={accessDeniedMsg} />}
+      <NotificationBanner msg={bannerMsg} type={bannerType} />
 
       <div className="flex items-center justify-between mb-6 gap-4">
         <h1 className="text-[22px] font-bold text-text-primary">Evaluaciones realizadas</h1>
@@ -203,7 +216,7 @@ function AdminDashboard({ accessDeniedMsg }) {
 
 // ── EvaluadorDashboard ────────────────────────────────────────────────────────
 
-function EvaluadorDashboard({ user, accessDeniedMsg }) {
+function EvaluadorDashboard({ user, bannerMsg, bannerType }) {
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -256,7 +269,7 @@ function EvaluadorDashboard({ user, accessDeniedMsg }) {
   if (!loading && !error && flows.length === 0) {
     return (
       <div>
-        {accessDeniedMsg && <AccessDeniedBanner msg={accessDeniedMsg} />}
+        <NotificationBanner msg={bannerMsg} type={bannerType} />
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <p className="text-[16px] font-semibold text-text-secondary mb-2">
             Aún no tienes flujos asignados
@@ -271,7 +284,7 @@ function EvaluadorDashboard({ user, accessDeniedMsg }) {
 
   return (
     <div>
-      {accessDeniedMsg && <AccessDeniedBanner msg={accessDeniedMsg} />}
+      <NotificationBanner msg={bannerMsg} type={bannerType} />
 
       <div className="flex items-center justify-between mb-6 gap-4">
         <h1 className="text-[22px] font-bold text-text-primary">Mis flujos asignados</h1>
@@ -295,11 +308,16 @@ function EvaluadorDashboard({ user, accessDeniedMsg }) {
 export default function DashboardPage() {
   const { role, user } = useAuth()
   const location       = useLocation()
-  const accessDeniedMsg = location.state?.accessDenied ?? null
+
+  // Banners from redirects or deletions
+  const accessDeniedMsg = location.state?.accessDenied  ?? null
+  const deletedFlowMsg  = location.state?.deletedFlow   ?? null
+  const bannerMsg       = accessDeniedMsg || deletedFlowMsg
+  const bannerType      = deletedFlowMsg ? 'success' : 'error'
 
   if (role === 'evaluador') {
-    return <EvaluadorDashboard user={user} accessDeniedMsg={accessDeniedMsg} />
+    return <EvaluadorDashboard user={user} bannerMsg={bannerMsg} bannerType={bannerType} />
   }
 
-  return <AdminDashboard accessDeniedMsg={accessDeniedMsg} />
+  return <AdminDashboard bannerMsg={bannerMsg} bannerType={bannerType} />
 }

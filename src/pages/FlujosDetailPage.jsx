@@ -6,6 +6,144 @@ import { useAuth } from '../hooks/useAuth'
 import { getScoreColor, getScoreBg } from '../utils/scoring'
 import { CRITERIA } from '../data/criteria'
 
+// ── DeleteFlowModal ───────────────────────────────────────────────────────────
+
+function DeleteFlowModal({ flow, evalCount, onClose, onDeleted }) {
+  const [confirmText, setConfirmText] = useState('')
+  const [deleting,    setDeleting]    = useState(false)
+  const [error,       setError]       = useState('')
+
+  const canDelete = confirmText === flow.name && !deleting
+
+  async function handleDelete() {
+    if (!canDelete) return
+    setDeleting(true)
+    setError('')
+
+    try {
+      // 1. Get evaluation IDs for this flow
+      const { data: evals, error: evErr } = await supabase
+        .from('evaluations')
+        .select('id')
+        .eq('flow_id', flow.id)
+      if (evErr) throw evErr
+
+      const evalIds = (evals ?? []).map(e => e.id)
+
+      // 2. Delete child rows of evaluations
+      if (evalIds.length > 0) {
+        const { error: ecErr } = await supabase
+          .from('evaluation_criteria')
+          .delete()
+          .in('evaluation_id', evalIds)
+        if (ecErr) throw ecErr
+
+        const { error: eeErr } = await supabase
+          .from('evaluation_evaluators')
+          .delete()
+          .in('evaluation_id', evalIds)
+        if (eeErr) throw eeErr
+      }
+
+      // 3. Delete evaluations
+      const { error: evalsErr } = await supabase
+        .from('evaluations')
+        .delete()
+        .eq('flow_id', flow.id)
+      if (evalsErr) throw evalsErr
+
+      // 4. Delete permissions
+      const { error: fepErr } = await supabase
+        .from('flow_evaluator_permissions')
+        .delete()
+        .eq('flow_id', flow.id)
+      if (fepErr) throw fepErr
+
+      // 5. Delete the flow itself
+      const { error: flowErr } = await supabase
+        .from('flows')
+        .delete()
+        .eq('id', flow.id)
+      if (flowErr) throw flowErr
+
+      onDeleted(flow.name)
+    } catch (err) {
+      setError(err.message || 'Error al eliminar el flujo.')
+      setDeleting(false)
+    }
+  }
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape' && !deleting) onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [deleting, onClose])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={() => { if (!deleting) onClose() }}
+      />
+      <div className="relative w-full max-w-md bg-background-surface border border-border-default rounded-2xl shadow-2xl p-6">
+
+        <h2 className="text-[17px] font-bold text-text-primary mb-3">
+          ¿Eliminar «{flow.name}»?
+        </h2>
+
+        <p className="text-[13px] text-text-secondary leading-relaxed mb-2">
+          Estás a punto de eliminar este flujo y toda su información asociada:
+        </p>
+        <ul className="text-[13px] text-text-secondary space-y-0.5 mb-4 pl-4 list-disc leading-relaxed">
+          <li>{evalCount} evaluación{evalCount !== 1 ? 'es' : ''} realizada{evalCount !== 1 ? 's' : ''}</li>
+          <li>Todo el historial de resultados</li>
+          <li>Todos los permisos de evaluadores asignados</li>
+        </ul>
+        <p className="text-[12px] font-semibold text-danger mb-5">
+          Esta acción es permanente e irreversible.
+        </p>
+
+        <label className="block text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
+          Escribe el nombre del flujo para confirmar:
+        </label>
+        <input
+          type="text"
+          value={confirmText}
+          onChange={e => setConfirmText(e.target.value)}
+          placeholder={flow.name}
+          autoFocus
+          disabled={deleting}
+          className="w-full bg-background-elevated border border-border-default rounded-lg px-3.5 py-2.5 text-[13px] text-text-primary placeholder:text-text-hint focus:outline-none focus:border-danger transition-colors mb-4"
+        />
+
+        {error && (
+          <p className="text-[12px] text-danger bg-danger/10 border border-danger/30 rounded-lg px-3 py-2 mb-4">
+            {error}
+          </p>
+        )}
+
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={deleting}
+            className="flex-1 px-4 py-2.5 rounded-lg border border-border-default text-[13px] text-text-secondary hover:text-text-primary hover:border-border-strong transition-all disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={!canDelete}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-danger text-white text-[13px] font-bold transition-opacity disabled:opacity-40"
+          >
+            {deleting ? 'Eliminando…' : 'Eliminar definitivamente'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const fmtDate = (iso, opts = { day: 'numeric', month: 'short', year: 'numeric' }) =>
@@ -168,6 +306,7 @@ export default function FlujosDetailPage() {
 
   const [canEvaluate,       setCanEvaluate]       = useState(false)
   const [evaluatorProfiles, setEvaluatorProfiles] = useState([])
+  const [showDelete,        setShowDelete]         = useState(false)
 
   // ── Check if user can evaluate this flow ─────────────────────────────────
   useEffect(() => {
@@ -317,7 +456,7 @@ export default function FlujosDetailPage() {
       </div>
 
       {/* ── ZONA 2: Historial ─────────────────────────────────────────────── */}
-      <div className="bg-background-surface border border-border-default rounded-xl overflow-hidden">
+      <div id="historial" className="bg-background-surface border border-border-default rounded-xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-default">
           <div>
@@ -371,6 +510,63 @@ export default function FlujosDetailPage() {
           ))
         )}
       </div>
+
+      {/* ── ZONA 3: Zona de riesgo (solo admin) ─────────────────────────── */}
+      {role === 'admin' && (
+        <div
+          className="mt-6 rounded-xl p-5"
+          style={{
+            background:    '#FEF2F2',
+            border:        '1px solid #FECACA',
+            borderLeft:    '4px solid #DC2626',
+          }}
+        >
+          <h3
+            className="text-[13px] font-bold uppercase tracking-wider mb-1.5"
+            style={{ color: '#DC2626' }}
+          >
+            Zona de riesgo
+          </h3>
+          <p className="text-[13px] mb-4" style={{ color: '#6B7280' }}>
+            Eliminar este flujo borrará permanentemente todas sus evaluaciones
+            e historial. Esta acción no se puede deshacer.
+          </p>
+          <button
+            onClick={() => setShowDelete(true)}
+            className="px-4 py-2 rounded-lg border text-[13px] font-semibold transition-colors"
+            style={{
+              background:   '#FFFFFF',
+              borderColor:  '#DC2626',
+              color:        '#DC2626',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = '#DC2626'
+              e.currentTarget.style.color      = '#FFFFFF'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = '#FFFFFF'
+              e.currentTarget.style.color      = '#DC2626'
+            }}
+          >
+            Eliminar flujo
+          </button>
+        </div>
+      )}
+
+      {/* ── Delete modal ──────────────────────────────────────────────────── */}
+      {showDelete && (
+        <DeleteFlowModal
+          flow={flow}
+          evalCount={evaluations.length}
+          onClose={() => setShowDelete(false)}
+          onDeleted={(flowName) => {
+            navigate('/', {
+              replace: true,
+              state: { deletedFlow: `El flujo "${flowName}" fue eliminado correctamente.` },
+            })
+          }}
+        />
+      )}
     </div>
   )
 }
